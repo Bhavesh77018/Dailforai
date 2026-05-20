@@ -1,65 +1,192 @@
-import Image from "next/image";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useTheme } from '@/contexts/ThemeContext';
+import Sidebar, { ChatSession } from '@/components/Sidebar';
+import LoginModal from '@/components/LoginModal';
+import ChatLanding from '@/components/ChatLanding';
+import Dashboard from '@/components/Dashboard';
+import RecruitmentAgent from '@/components/RecruitmentAgent';
+import SalesAgent from '@/components/SalesAgent';
+import ProspectFinder from '@/components/ProspectFinder';
+import AgentHistory from '@/components/AgentHistory';
+import RecruitmentDashboard from '@/components/RecruitmentDashboard';
+
+type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline';
 
 export default function Home() {
+  const [view, setView] = useState<View>('chat');
+  const [selectedAgent, setSelectedAgent] = useState<'recruitment' | 'sales' | 'prospect'>('recruitment');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [showLogin, setShowLogin] = useState(false);
+  const [counts, setCounts] = useState({ prospects: 0, runs: 0, emails: 0 });
+  const [chatCount, setChatCount] = useState(0);
+  // Chat session management
+  const [sessionId, setSessionId] = useState<string>(() => crypto.randomUUID());
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [initialMessages, setInitialMessages] = useState<any[] | undefined>(undefined);
+  const { theme, toggle } = useTheme();
+
+  /* ── Auth ── */
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  /* ── Counts from Supabase ── */
+  useEffect(() => {
+    async function load() {
+      try {
+        const [p, r, e] = await Promise.allSettled([
+          supabase.from('prospects').select('id', { count: 'exact', head: true }),
+          supabase.from('agent_runs').select('id', { count: 'exact', head: true }),
+          supabase.from('sales_outreach').select('id', { count: 'exact', head: true }),
+        ]);
+        setCounts({
+          prospects: p.status === 'fulfilled' ? p.value.count || 0 : 0,
+          runs: r.status === 'fulfilled' ? r.value.count || 0 : 0,
+          emails: e.status === 'fulfilled' ? e.value.count || 0 : 0,
+        });
+      } catch {}
+    }
+    load();
+    const t = setInterval(load, 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  const navigate = (v: string) => {
+    if (v === 'dashboard' && !user) { setShowLogin(true); return; }
+    setView(v as View);
+    setSidebarOpen(false);
+  };
+
+  const handleNewChat = () => {
+    setSessionId(crypto.randomUUID());
+    setActiveChatId(null);
+    setInitialMessages(undefined);
+    setView('chat');
+    setSidebarOpen(false);
+  };
+
+  const handleLoadSession = (session: ChatSession) => {
+    setSessionId(session.id);
+    setActiveChatId(session.id);
+    setSelectedAgent(session.agent as any);
+    setInitialMessages(session.messages);
+    setView('chat');
+    setSidebarOpen(false);
+  };
+
+  const launchAgent = (agent: 'recruitment' | 'sales' | 'prospect') => {
+    setSelectedAgent(agent);
+    setView('chat');
+    setSidebarOpen(false);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setView('chat');
+  };
+
+  const handleLoginSuccess = (u: any) => {
+    setUser(u);
+    setShowLogin(false);
+    if (view === 'chat') {
+      // Stay on chat if they were forced to login from chatting
+    } else {
+      setView('dashboard');
+    }
+  };
+
+  const handleChatAction = () => {
+    if (!user) {
+      if (chatCount >= 1) {
+        setShowLogin(true);
+        return false; // prevent chat
+      }
+      setChatCount(c => c + 1);
+    }
+    return true; // allow chat
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="app-shell">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div onClick={() => setSidebarOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 49 }} />
+      )}
+
+      <Sidebar
+        activeView={view}
+        onNavigate={navigate}
+        isOpen={sidebarOpen}
+        isCollapsed={sidebarCollapsed}
+        user={user}
+        onLoginClick={() => setShowLogin(true)}
+        onLogout={handleLogout}
+        counts={counts}
+        onNewChat={handleNewChat}
+        onLoadSession={handleLoadSession}
+        activeChatId={activeChatId}
+      />
+
+      <div className="main-area">
+        {/* Topbar */}
+        <div className="topbar">
+          <div className="topbar-left">
+            <button className="toggle-sidebar-btn" onClick={() => {
+              if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+                setSidebarOpen(!sidebarOpen);
+              } else {
+                setSidebarCollapsed(!sidebarCollapsed);
+              }
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
+            <span style={{ fontWeight: 600, fontSize: 15, display: sidebarCollapsed || (typeof window !== 'undefined' && window.innerWidth <= 768) ? 'block' : 'none' }}>
+              DailforAI
+            </span>
+          </div>
+          <div className="topbar-actions">
+            <button className="theme-toggle" onClick={toggle}>
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+          {view === 'chat' && <ChatLanding onNavigate={navigate} onChatAction={handleChatAction} user={user} selectedAgent={selectedAgent} setSelectedAgent={setSelectedAgent} sessionId={sessionId} initialMessages={initialMessages} onNewChat={handleNewChat} />}
+          {view === 'dashboard' && user && <Dashboard onNavigate={navigate} />}
+          {view === 'recruitment' && <RecruitmentAgent onLaunch={() => launchAgent('recruitment')} />}
+          {view === 'sales' && <SalesAgent onLaunch={() => launchAgent('sales')} />}
+          {view === 'prospect' && <ProspectFinder onLaunch={() => launchAgent('prospect')} />}
+          {view === 'history' && <AgentHistory />}
+          {view === 'pipeline' && user && <RecruitmentDashboard />}
+
+          {/* Guard: dashboard requires login */}
+          {view === 'dashboard' && !user && (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, padding: 40 }}>
+              <div style={{ fontSize: 48 }}>🔐</div>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>Dashboard requires login</div>
+              <div style={{ color: 'var(--text-2)' }}>Sign in to access your recruiter pipeline dashboard.</div>
+              <button className="btn btn-primary" onClick={() => setShowLogin(true)}>Sign In →</button>
+            </div>
+          )}
         </div>
-      </main>
+      </div>
+
+      {showLogin && (
+        <LoginModal onClose={() => setShowLogin(false)} onSuccess={handleLoginSuccess} />
+      )}
     </div>
   );
 }
