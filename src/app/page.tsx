@@ -153,7 +153,7 @@ export default function Home() {
               </svg>
             </button>
             <span style={{ fontWeight: 600, fontSize: 15, display: sidebarCollapsed || (typeof window !== 'undefined' && window.innerWidth <= 768) ? 'block' : 'none' }}>
-              DailforAI
+              DialforAI
             </span>
           </div>
           <div className="topbar-actions">

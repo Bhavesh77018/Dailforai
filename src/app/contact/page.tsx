@@ -18,7 +18,7 @@ export default function ContactPage() {
       <nav style={{ padding: '24px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, background: 'var(--bg-main)', zIndex: 100 }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'var(--text-1)' }}>
           <Hexagon />
-          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>DailforAI</span>
+          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>DialforAI</span>
         </Link>
         <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
           <Link href="/about" style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-2)', textDecoration: 'none' }}>About</Link>
@@ -43,7 +43,7 @@ export default function ContactPage() {
             </h1>
             
             <p style={{ fontSize: 18, color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 40 }}>
-              Need modifications, custom enterprise integrations, or have questions about how DailforAI can scale your workflow? Our engineering team is ready to help.
+              Need modifications, custom enterprise integrations, or have questions about how DialforAI can scale your workflow? Our engineering team is ready to help.
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -53,7 +53,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)', marginBottom: 4 }}>EMAIL US</div>
-                  <div style={{ fontSize: 16, fontWeight: 500 }}>hello@dailforai.com</div>
+                  <div style={{ fontSize: 16, fontWeight: 500 }}>hello@dialforai.com</div>
                 </div>
               </div>
             </div>
@@ -101,7 +101,7 @@ export default function ContactPage() {
 
       {/* Footer */}
       <footer style={{ padding: '40px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--text-3)', fontSize: 14 }}>
-        <div>&copy; 2026 DailforAI. All rights reserved.</div>
+        <div>&copy; 2026 DialforAI. All rights reserved.</div>
         <div style={{ display: 'flex', gap: 24 }}>
           <Link href="/contact" style={{ color: 'var(--text-3)', textDecoration: 'none' }}>Contact Us</Link>
           <Link href="/about" style={{ color: 'var(--text-3)', textDecoration: 'none' }}>About</Link>

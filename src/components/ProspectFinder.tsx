@@ -22,7 +22,7 @@ export default function ProspectFinder({ onLaunch }: Props) {
         </h1>
         
         <p style={{ fontSize: 19, color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 650, margin: '0 auto 40px' }}>
-          DailforAI acts as your autonomous research assistant. Provide natural language descriptions of your ideal customer profile, and it executes live web queries to find the exact decision makers.
+          DialforAI acts as your autonomous research assistant. Provide natural language descriptions of your ideal customer profile, and it executes live web queries to find the exact decision makers.
         </p>
 
         <button className="btn btn-primary" onClick={onLaunch} style={{ padding: '14px 32px', fontSize: 16, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 8px 30px rgba(16, 185, 129, 0.3)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>

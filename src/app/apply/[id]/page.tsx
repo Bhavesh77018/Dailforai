@@ -164,7 +164,7 @@ export default function ApplicationPortal({ params }: { params: Promise<{ id: st
       <nav style={{ padding: '16px 40px', borderBottom: '1px solid var(--border)', background: 'var(--bg-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <Hexagon style={{ color: '#4f46e5' }} />
-          <span style={{ fontSize: 18, fontWeight: 700 }}>DailforAI Applicant Portal</span>
+          <span style={{ fontSize: 18, fontWeight: 700 }}>DialforAI Applicant Portal</span>
         </div>
         {started && !completed && warnings > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#ef4444', fontSize: 12, fontWeight: 600, background: 'rgba(239, 68, 68, 0.1)', padding: '6px 12px', borderRadius: 999 }}>

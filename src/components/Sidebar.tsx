@@ -80,7 +80,7 @@ export default function Sidebar({ activeView, onNavigate, isOpen, isCollapsed, u
       <div className="sidebar-top">
         <div className="brand">
           <Hexagon />
-          <div className="brand-name">DailforAI</div>
+          <div className="brand-name">DialforAI</div>
         </div>
         <button className="new-chat-btn" onClick={onNewChat}>
           <Plus size={15} />

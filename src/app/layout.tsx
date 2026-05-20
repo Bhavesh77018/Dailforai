@@ -3,7 +3,7 @@ import "./globals.css";
 import ThemeProviderClient from '@/components/ThemeProviderClient';
 
 export const metadata: Metadata = {
-  title: "DailfOrAI — AI Agent Platform",
+  title: "DialforAI — AI Agent Platform",
   description: "Autonomous AI agents for recruitment, sales outreach, and prospect discovery. Powered by GPT-4o.",
 };
 

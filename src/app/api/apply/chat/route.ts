@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, reqId, warnings } = await req.json();
 
-    const system = `You are an expert AI Technical Interviewer for DailforAI.
+    const system = `You are an expert AI Technical Interviewer for DialforAI.
 You are interviewing a candidate for the job requisition ID: ${reqId}.
 You must conduct a rigorous, professional interview. 
 

@@ -22,7 +22,7 @@ export default function RecruitmentAgent({ onLaunch }: Props) {
         </h1>
         
         <p style={{ fontSize: 19, color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 650, margin: '0 auto 40px' }}>
-          DailforAI uses advanced multi-pass extraction to build structured profiles from LinkedIn, GitHub, and Naukri. It conducts interviews, detects cheating, and scores candidates on a transparent rubric.
+          DialforAI uses advanced multi-pass extraction to build structured profiles from LinkedIn, GitHub, and Naukri. It conducts interviews, detects cheating, and scores candidates on a transparent rubric.
         </p>
 
         <button className="btn btn-primary" onClick={onLaunch} style={{ padding: '14px 32px', fontSize: 16, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 8px 30px rgba(79, 70, 229, 0.3)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>

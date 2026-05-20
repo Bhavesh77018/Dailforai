@@ -10,7 +10,7 @@ export default function AboutPage() {
       <nav style={{ padding: '24px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, background: 'var(--bg-main)', zIndex: 100 }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'var(--text-1)' }}>
           <Hexagon />
-          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>DailforAI</span>
+          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>DialforAI</span>
         </Link>
         <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
           <Link href="/about" style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-1)', textDecoration: 'none' }}>About</Link>
@@ -36,7 +36,7 @@ export default function AboutPage() {
         </h1>
         
         <p style={{ fontSize: 'clamp(18px, 2vw, 22px)', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 700, margin: '0 auto 40px', animation: 'slideUp 1s ease-out' }}>
-          DailforAI is a premium Agent OS that deploys autonomous AI workers to scale your recruitment, accelerate outbound sales, and find your ideal prospects on autopilot.
+          DialforAI is a premium Agent OS that deploys autonomous AI workers to scale your recruitment, accelerate outbound sales, and find your ideal prospects on autopilot.
         </p>
 
         <div style={{ display: 'flex', gap: 16, animation: 'slideUp 1.2s ease-out' }}>
@@ -56,7 +56,7 @@ export default function AboutPage() {
         
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16 }}>How DailforAI Works</h2>
+            <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16 }}>How DialforAI Works</h2>
             <p style={{ fontSize: 18, color: 'var(--text-2)', maxWidth: 600, margin: '0 auto' }}>The easiest way to integrate specialized AI agents into your business operations.</p>
           </div>
           
@@ -132,7 +132,7 @@ export default function AboutPage() {
                   </div>
                   <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <div style={{ padding: 16, background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 14, color: 'var(--text-3)' }}>Subject: Scaling your engineering team</div>
-                    <div style={{ padding: 16, background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', borderRadius: 8, fontSize: 14 }}>"Hi Sarah, noticed you just raised Series B. Instead of hiring 5 junior devs, DailforAI can..."</div>
+                    <div style={{ padding: 16, background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', borderRadius: 8, fontSize: 14 }}>"Hi Sarah, noticed you just raised Series B. Instead of hiring 5 junior devs, DialforAI can..."</div>
                   </div>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export default function AboutPage() {
       <section style={{ padding: '120px 40px', background: 'linear-gradient(180deg, var(--bg-main) 0%, var(--bg-card) 100%)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{ fontSize: 40, fontWeight: 800, marginBottom: 16, letterSpacing: '-0.03em' }}>More Agents Coming Soon</h2>
-          <p style={{ fontSize: 18, color: 'var(--text-2)', maxWidth: 600, margin: '0 auto 64px' }}>We are constantly expanding the DailforAI operating system. Here is what's next on the roadmap.</p>
+          <p style={{ fontSize: 18, color: 'var(--text-2)', maxWidth: 600, margin: '0 auto 64px' }}>We are constantly expanding the DialforAI operating system. Here is what's next on the roadmap.</p>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 24 }}>
             <div style={{ padding: 32, background: 'var(--bg-main)', border: '1px dashed var(--border-2)', borderRadius: 24 }}>
@@ -225,7 +225,7 @@ export default function AboutPage() {
           <Cpu size={48} style={{ color: 'var(--text-1)', marginBottom: 32, opacity: 0.8 }} />
           <h2 style={{ fontSize: 40, fontWeight: 800, marginBottom: 24, letterSpacing: '-0.03em' }}>Built by Brilliant Brains</h2>
           <p style={{ fontSize: 20, color: 'var(--text-2)', lineHeight: 1.7, maxWidth: 800, margin: '0 auto' }}>
-            DailforAI wasn't built by a standard agency. It is engineered by a specialized team of brilliant software engineers, AI researchers, and UX designers who previously scaled systems at top-tier tech giants. We understand exactly what it takes to build highly reliable, autonomous software that safely interfaces with your production data. We obsessed over every line of code so you don't have to.
+            DialforAI wasn't built by a standard agency. It is engineered by a specialized team of brilliant software engineers, AI researchers, and UX designers who previously scaled systems at top-tier tech giants. We understand exactly what it takes to build highly reliable, autonomous software that safely interfaces with your production data. We obsessed over every line of code so you don't have to.
           </p>
         </div>
       </section>
@@ -236,7 +236,7 @@ export default function AboutPage() {
         
         <div style={{ position: 'relative', zIndex: 1 }}>
           <h2 style={{ fontSize: 40, fontWeight: 800, marginBottom: 24 }}>Ready to scale your workforce?</h2>
-          <p style={{ fontSize: 18, color: 'var(--text-2)', marginBottom: 40 }}>Deploy DailforAI's autonomous agents today and focus on what matters.</p>
+          <p style={{ fontSize: 18, color: 'var(--text-2)', marginBottom: 40 }}>Deploy DialforAI's autonomous agents today and focus on what matters.</p>
           <Link href="/" className="btn btn-primary" style={{ padding: '16px 40px', fontSize: 16, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 10, textDecoration: 'none', boxShadow: '0 10px 30px rgba(79, 70, 229, 0.3)' }}>
             Open Workspace <ArrowRight size={18} />
           </Link>
@@ -245,7 +245,7 @@ export default function AboutPage() {
 
       {/* Footer footer */}
       <footer style={{ padding: '40px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'var(--text-3)', fontSize: 14 }}>
-        <div>&copy; 2026 DailforAI. All rights reserved.</div>
+        <div>&copy; 2026 DialforAI. All rights reserved.</div>
         <div style={{ display: 'flex', gap: 24 }}>
           <Link href="/contact" style={{ color: 'var(--text-3)', textDecoration: 'none' }}>Contact Us</Link>
           <Link href="/about" style={{ color: 'var(--text-3)', textDecoration: 'none' }}>About</Link>
