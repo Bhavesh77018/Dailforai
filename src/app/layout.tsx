@@ -1,10 +1,30 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThemeProviderClient from '@/components/ThemeProviderClient';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "DialforAI — AI Agent Platform",
   description: "Autonomous AI agents for recruitment, sales outreach, and prospect discovery. Powered by GPT-4o.",
+  metadataBase: new URL('https://www.dialforai.com'),
+  openGraph: {
+    title: "DialforAI — AI Agent Platform",
+    description: "Autonomous AI agents for recruitment, sales outreach, and prospect discovery.",
+    url: "https://www.dialforai.com",
+    siteName: "DialforAI",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DialforAI — AI Agent Platform",
+    description: "Autonomous AI agents for recruitment, sales outreach, and prospect discovery.",
+  },
 };
 
 export default function RootLayout({

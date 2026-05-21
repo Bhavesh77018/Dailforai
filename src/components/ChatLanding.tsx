@@ -165,7 +165,7 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
         const reply = data.reply || data.error || 'Response received.';
         setMessages(prev => [...prev, { role: 'ai', content: reply }]);
         // Detect magic link in reply
-        const magicMatch = reply.match(/https:\/\/dialforai\.com\/apply\/req-([a-zA-Z0-9-]+)/);
+        const magicMatch = reply.match(/https:\/\/(?:www\.)?dialforai\.com\/apply\/req-([a-zA-Z0-9-]+)/);
         if (magicMatch) {
           const reqId = magicMatch[1];
           // Extract job title from the reply (first heading line)
@@ -175,7 +175,7 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
           // 1. Log to activity log (agent_runs)
           logToDb(
             { message: `Generated Job Posting & Magic Link: req-${reqId}`, reqId },
-            { reply, link: `${process.env.NEXT_PUBLIC_APP_URL || ''}/apply/${reqId}`, jobTitle },
+            { reply, link: `https://www.dialforai.com/apply/${reqId}`, jobTitle },
             1500
           );
 
@@ -262,7 +262,7 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
                       .replace(/\*?\*?🚀 Magic Application Link:\*?\*?.*?(\n|$)/gi, '')
                       .replace(/\*?\(Candidates who apply via this link.*?\)\*?/gi, '')
                       .replace(/<generate-random-id>/gi, '')
-                      .replace(/\[https:\/\/dialforai\.com\/apply\/req-\]\(https:\/\/dialforai\.com\/apply\/req-\)/gi, '')
+                      .replace(/\[https:\/\/(?:www\.)?dialforai\.com\/apply\/req-\]\(https:\/\/(?:www\.)?dialforai\.com\/apply\/req-\)/gi, '')
                       .replace(/\*\*(.*?)\*\*/g, '$1')
                       .trim()}
                   </div>
@@ -300,7 +300,7 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
                   )}
 
                   {/* Magic Link Renderer */}
-                  {m.role === 'ai' && m.content.includes('dialforai.com/apply/req-') && (
+                  {m.role === 'ai' && (m.content.includes('dialforai.com/apply/req-') || m.content.includes('www.dialforai.com/apply/req-')) && (
                     <div style={{ marginTop: 16, background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(236, 72, 153, 0.05))', border: '1px solid rgba(79, 70, 229, 0.2)', borderRadius: 12, padding: 16 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, color: '#4f46e5', fontWeight: 600 }}>
                         <LinkIcon size={16} /> Magic Application Link Generated
@@ -311,14 +311,14 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
                       <div style={{ display: 'flex', gap: 8 }}>
                         <input 
                           readOnly 
-                          value={(() => { const base = typeof window !== 'undefined' ? window.location.origin : ''; return m.content.match(/https:\/\/dialforai\.com\/apply\/req-[a-zA-Z0-9-]+/)?.[0]?.replace('https://dialforai.com', base) || `${base}/apply/req-new`; })()}
+                          value={(() => { return m.content.match(/https:\/\/(?:www\.)?dialforai\.com\/apply\/req-[a-zA-Z0-9-]+/)?.[0]?.replace('https://dialforai.com', 'https://www.dialforai.com') || `https://www.dialforai.com/apply/req-new`; })()}
                           style={{ flex: 1, padding: '8px 12px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg-input)', color: 'var(--text-1)', fontSize: 13 }}
                         />
                         <button 
                           className="btn btn-primary" 
                           style={{ padding: '8px 16px', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}
                           onClick={(e) => {
-                            const base = typeof window !== 'undefined' ? window.location.origin : ''; const link = m.content.match(/https:\/\/dialforai\.com\/apply\/req-[a-zA-Z0-9-]+/)?.[0]?.replace('https://dialforai.com', base) || `${base}/apply/req-new`;
+                            const link = m.content.match(/https:\/\/(?:www\.)?dialforai\.com\/apply\/req-[a-zA-Z0-9-]+/)?.[0]?.replace('https://dialforai.com', 'https://www.dialforai.com') || `https://www.dialforai.com/apply/req-new`;
                             navigator.clipboard.writeText(link);
                             const btn = e.currentTarget;
                             const originalHTML = btn.innerHTML;

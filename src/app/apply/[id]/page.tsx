@@ -56,7 +56,12 @@ export default function ApplicationPortal({ params }: { params: Promise<{ id: st
     const email = prompt('Enter your email to authenticate:');
     if (!email) return;
     try {
-      await supabase.auth.signInWithOtp({ email });
+      await supabase.auth.signInWithOtp({ 
+        email,
+        options: {
+          emailRedirectTo: `https://www.dialforai.com/apply/${id}`
+        }
+      });
       alert('Check your email for the login link!');
     } catch (e: any) {
       alert(e.message);
@@ -161,13 +166,13 @@ export default function ApplicationPortal({ params }: { params: Promise<{ id: st
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-1)', fontFamily: 'var(--font-sans)', display: 'flex', flexDirection: 'column' }}>
-      <nav style={{ padding: '16px 40px', borderBottom: '1px solid var(--border)', background: 'var(--bg-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Hexagon style={{ color: '#4f46e5' }} />
-          <span style={{ fontSize: 18, fontWeight: 700 }}>DialforAI Applicant Portal</span>
+      <nav style={{ padding: 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 40px)', borderBottom: '1px solid var(--border)', background: 'var(--bg-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <Hexagon style={{ color: '#4f46e5', flexShrink: 0 }} />
+          <span style={{ fontSize: 'clamp(14px, 4vw, 18px)', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>DialforAI Applicant Portal</span>
         </div>
         {started && !completed && warnings > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#ef4444', fontSize: 12, fontWeight: 600, background: 'rgba(239, 68, 68, 0.1)', padding: '6px 12px', borderRadius: 999 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#ef4444', fontSize: 12, fontWeight: 600, background: 'rgba(239, 68, 68, 0.1)', padding: '6px 12px', borderRadius: 999, flexShrink: 0 }}>
             <ShieldAlert size={14} /> Suspicious Activity Logged
           </div>
         )}

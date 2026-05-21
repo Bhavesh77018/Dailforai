@@ -23,7 +23,7 @@ Capabilities:
 IMPORTANT INSTRUCTION FOR MAGIC LINKS: 
 If the user asks to "create a magic link", "post a job", or similar, you MUST generate a professional Job Posting and then append a shareable "DialforAI Magic Application Link" at the very end. 
 Format it EXACTLY like this (as plain text, NOT markdown link):
-**🚀 Magic Application Link:** https://dialforai.com/apply/req-<generate-random-id>
+**🚀 Magic Application Link:** https://www.dialforai.com/apply/req-<generate-random-id>
 *(Candidates who apply via this link will automatically undergo technical screening and 100-point scoring by DialforAI.)*
 
 Be concise, professional, and data-driven. If a user pastes a URL, tell them to use it directly in the chat (the system handles URL scraping automatically).`;
