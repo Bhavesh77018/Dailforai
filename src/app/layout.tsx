@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ThemeProviderClient from '@/components/ThemeProviderClient';
+import AnimatedFavicon from '@/components/AnimatedFavicon';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -41,6 +42,7 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProviderClient>
+          <AnimatedFavicon />
           {children}
         </ThemeProviderClient>
       </body>
