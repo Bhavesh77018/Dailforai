@@ -170,7 +170,7 @@ export default function GrowthAgent({ user }: { user?: any }) {
      INPUT STEP
   ══════════════════════════════════════════════════════════════ */
   if (step === 'input') return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(16px, 3vw, 40px)', paddingTop: 'clamp(24px, 4vw, 48px)' }}>
+    <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(16px, 3vw, 40px)', paddingTop: 'clamp(64px, 5vw, 80px)' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
 
         {/* Header */}
@@ -316,7 +316,7 @@ export default function GrowthAgent({ user }: { user?: any }) {
   const { companyProfile, icp, marketOpportunity, leads, competitors, outreachIntelligence, growthStrategy, insights } = result;
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(12px, 2vw, 24px)' }}>
+    <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(12px, 2vw, 24px)', paddingTop: 'clamp(64px, 5vw, 80px)' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
 
         {/* ── Top Bar ──────────────────────────────────────────── */}
