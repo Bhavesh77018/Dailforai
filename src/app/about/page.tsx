@@ -1,7 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Hexagon, Users, Mail, Search, ArrowRight, Zap, ShieldCheck, BrainCircuit, Bot, Code, Sparkles, Cpu, Menu, X } from 'lucide-react';
+import { Hexagon, Users, Mail, Search, TrendingUp, ArrowRight, Zap, ShieldCheck, BrainCircuit, Bot, Code, Sparkles, Cpu, Menu, X } from 'lucide-react';
+
 
 export default function AboutPage() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -190,6 +191,36 @@ export default function AboutPage() {
                   <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
                     <div style={{ padding: 12, background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13 }}>"Find SaaS CTOs in New York with 50-200 employees."</div>
                     <div style={{ padding: 12, background: 'rgba(16, 185, 129, 0.1)', color: '#059669', borderRadius: 8, fontSize: 13 }}>Found 4 matches.<br/>1. Jane Smith (CTO @ TechFlow)<br/>2. Mark Johnson (VP Eng @ DataSync)...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Growth Intelligence */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(24px, 5vw, 48px)', alignItems: 'center' }}>
+              <div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderRadius: 999, fontSize: 12, fontWeight: 600, marginBottom: 20 }}>
+                  <TrendingUp size={14} /> Growth Agent
+                </div>
+                <h3 style={{ fontSize: 'clamp(20px, 4vw, 36px)', fontWeight: 800, marginBottom: 16, lineHeight: 1.2 }}>Senior BDM Consultant.</h3>
+                <p style={{ fontSize: 'clamp(13px, 1.8vw, 18px)', color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 24 }}>
+                  Analyze company profiles, research market needs, identify Ideal Customer Profiles (ICP), build targeted lead opportunities, and draft competitor outreach tactics.
+                </p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-1)', fontSize: 'clamp(12px, 1.5vw, 15px)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <li style={{ display: 'flex', gap: 10, alignItems: 'center' }}><ShieldCheck size={18} color="#10b981" /> Full market research & competitor gap analysis</li>
+                  <li style={{ display: 'flex', gap: 10, alignItems: 'center' }}><BrainCircuit size={18} color="#10b981" /> ICP building & outbound outreach strategies</li>
+                </ul>
+              </div>
+              <div style={{ background: 'var(--bg-card)', padding: 'clamp(20px, 4vw, 40px)', borderRadius: 20, border: '1px solid var(--border)', boxShadow: '0 16px 40px rgba(0,0,0,0.2)' }}>
+                <div style={{ width: '100%', height: 240, background: 'var(--bg-input)', borderRadius: 12, border: '1px solid var(--border-2)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  <div style={{ borderBottom: '1px solid var(--border-2)', padding: '10px 16px', display: 'flex', gap: 6 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
+                  </div>
+                  <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ padding: 12, background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, color: 'var(--text-3)' }}>Company profile: Infinity STS</div>
+                    <div style={{ padding: 12, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderRadius: 8, fontSize: 13 }}>"BDM Growth Strategy: Target USA healthcare clinics with IT staffing. Competitor gap: custom EHR integrations."</div>
                   </div>
                 </div>
               </div>

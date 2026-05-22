@@ -106,9 +106,14 @@ function Pill({ text, color }: { text: string; color?: string }) {
   );
 }
 
+interface GrowthAgentProps {
+  user?: any;
+  onLaunch?: () => void;
+}
+
 /* ─── Main Component ──────────────────────────────────────────── */
-export default function GrowthAgent({ user }: { user?: any }) {
-  const [step, setStep] = useState<'input' | 'loading' | 'results'>('input');
+export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
+  const [step, setStep] = useState<'landing' | 'input' | 'loading' | 'results'>('landing');
   const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('leads');
@@ -131,6 +136,100 @@ export default function GrowthAgent({ user }: { user?: any }) {
 
   const set = (k: keyof GrowthForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
+
+  /* ══════════════════════════════════════════════════════════════
+     LANDING STEP
+     ══════════════════════════════════════════════════════════════ */
+  if (step === 'landing') return (
+    <div className="fade-in" style={{ padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', maxWidth: 1100, margin: '0 auto', width: '100%', height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+      
+      {/* Hero Section */}
+      <div style={{ textAlign: 'center', marginBottom: 80, animation: 'slideUp 0.6s ease-out' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 999, fontSize: 13, fontWeight: 600, color: '#10b981', marginBottom: 32 }}>
+          <TrendingUp size={16} /> Autonomous AI Agent
+        </div>
+        
+        <h1 style={{ fontSize: 'clamp(28px, 6vw, 56px)', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 24, lineHeight: 1.1 }}>
+          Growth Intelligence, <br/>
+          <span style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Fully Unleashed.</span>
+        </h1>
+        
+        <p style={{ fontSize: 'clamp(14px, 3vw, 19px)', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 650, margin: '0 auto 40px' }}>
+          DialforAI acts as your senior business development consultant. It performs market research, maps competitor weak spots, builds Ideal Customer Profiles (ICPs), and uncovers high-intent sales leads.
+        </p>
+
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button className="btn btn-primary" onClick={onLaunch} style={{ padding: '14px 32px', fontSize: 16, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 8px 30px rgba(16, 185, 129, 0.3)', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+            Launch BDM Chat Agent <ArrowRight size={18} />
+          </button>
+          
+          <button className="btn btn-outline" onClick={() => setStep('input')} style={{ padding: '14px 32px', fontSize: 16, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 10, transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }} onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+            Generate Interactive Report <Zap size={18} />
+          </button>
+        </div>
+      </div>
+
+      {/* Feature Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, animation: 'slideUp 0.8s ease-out' }}>
+        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+            <Target size={24} />
+          </div>
+          <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>ICP & Persona Mapping</h3>
+          <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Define clear Ideal Customer Profiles and buyer personas based on pain points and triggers.</p>
+        </div>
+        
+        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+            <Building2 size={24} />
+          </div>
+          <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>Competitor Analysis</h3>
+          <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Produce competitor battle cards mapping strengths, weaknesses, and differentiation win tactics.</p>
+        </div>
+
+        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+            <Users size={24} />
+          </div>
+          <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>Lead Discovery</h3>
+          <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Find highly matched target companies complete with hiring signals, location details, and matching logic.</p>
+        </div>
+
+        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+            <Mail size={24} />
+          </div>
+          <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>Outreach Strategy</h3>
+          <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Receive customized high-impact cold email subject lines, templates, and multi-touch sequence strategies.</p>
+        </div>
+      </div>
+
+      {/* How to Use Section */}
+      <div style={{ marginTop: 100, borderTop: '1px solid var(--border)', paddingTop: 80, paddingBottom: 60, animation: 'slideUp 1s ease-out' }}>
+        <h2 style={{ fontSize: 32, fontWeight: 800, textAlign: 'center', marginBottom: 48 }}>How to use the Growth Agent</h2>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 32, maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--bg-btn)', color: 'var(--text-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, marginBottom: 16 }}>1</div>
+            <h4 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Provide Company Info</h4>
+            <p style={{ color: 'var(--text-2)', lineHeight: 1.5, fontSize: 14 }}>Fill out details about what your company does and specify your target market or business objectives.</p>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--bg-btn)', color: 'var(--text-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, marginBottom: 16 }}>2</div>
+            <h4 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>AI Researching & Strategy</h4>
+            <p style={{ color: 'var(--text-2)', lineHeight: 1.5, fontSize: 14 }}>The agent parses your inputs, scans market dynamics, maps competitor strategies, and uncovers prospects.</p>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--bg-btn)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, marginBottom: 16, border: '1px solid #10b981' }}>3</div>
+            <h4 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Deploy Growth Tactics</h4>
+            <p style={{ color: 'var(--text-2)', lineHeight: 1.5, fontSize: 14 }}>Use the detailed leads list, outreach hooks, and action timeline report to drive sales outreach successfully.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   /* ── Run analysis ─────────────────────────────────────────── */
   const analyze = async () => {
@@ -170,7 +269,7 @@ export default function GrowthAgent({ user }: { user?: any }) {
      INPUT STEP
   ══════════════════════════════════════════════════════════════ */
   if (step === 'input') return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(16px, 3vw, 40px)', paddingTop: 'clamp(64px, 5vw, 80px)' }}>
+    <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(16px, 3vw, 40px)' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
 
         {/* Header */}
@@ -316,7 +415,7 @@ export default function GrowthAgent({ user }: { user?: any }) {
   const { companyProfile, icp, marketOpportunity, leads, competitors, outreachIntelligence, growthStrategy, insights } = result;
 
   return (
-    <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(12px, 2vw, 24px)', paddingTop: 'clamp(64px, 5vw, 80px)' }}>
+    <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(12px, 2vw, 24px)' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
 
         {/* ── Top Bar ──────────────────────────────────────────── */}

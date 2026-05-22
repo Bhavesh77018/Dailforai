@@ -1,15 +1,16 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, Send, Users, Mail, Search, Link as LinkIcon, Code, Briefcase, HelpCircle, Building2, UserCircle, Target, UserPlus } from 'lucide-react';
+import { Bot, Send, Users, Mail, Search, Link as LinkIcon, Code, Briefcase, HelpCircle, Building2, UserCircle, Target, UserPlus, TrendingUp, Lightbulb, Zap, Star } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-type AgentType = 'recruitment' | 'sales' | 'prospect';
+type AgentType = 'recruitment' | 'sales' | 'prospect' | 'growth';
 type Msg = { role: 'user' | 'ai'; content: string; extra?: any };
 
 const AGENTS = [
   { id: 'recruitment' as AgentType, label: 'Recruitment', icon: <Users size={16} />, classSuffix: 'recruit', endpoint: '/api/ai-agents/recruitment/chat-simple' },
   { id: 'sales' as AgentType, label: 'Sales', icon: <Mail size={16} />, classSuffix: 'sales', endpoint: '/api/ai-agents/sales/generate' },
   { id: 'prospect' as AgentType, label: 'Prospects', icon: <Search size={16} />, classSuffix: 'prospect', endpoint: '/api/ai-agents/prospect/find' },
+  { id: 'growth' as AgentType, label: 'Growth', icon: <TrendingUp size={16} />, classSuffix: 'growth', endpoint: '/api/ai-agents/growth/chat' },
 ];
 
 const QUICK_CARDS: Record<AgentType, { title: string; desc: string; prompt: string, icon: React.ReactNode }[]> = {
@@ -30,6 +31,12 @@ const QUICK_CARDS: Record<AgentType, { title: string; desc: string; prompt: stri
     { icon: <UserPlus />, title: 'VPs of Sales', desc: 'Series A-B startup leaders', prompt: 'Find VP of Sales at Series A-B fintech startups in Europe' },
     { icon: <Target />, title: 'AI Startup CEOs', desc: 'Research automation leaders', prompt: 'Research AI automation startup CEOs and decision makers' },
     { icon: <Briefcase />, title: 'Marketing Directors', desc: 'E-commerce brand CMOs', prompt: 'Find Marketing Directors at e-commerce brands with revenue above $10M' },
+  ],
+  growth: [
+    { icon: <TrendingUp />, title: 'BDM Strategy', desc: 'Targeted growth recommendation', prompt: 'Suggest a B2B growth strategy for a software agency targeting healthcare clients in the US.' },
+    { icon: <Target />, title: 'Define ICP', desc: 'Find your ideal customer profile', prompt: 'Define the Ideal Customer Profile (ICP) and buyer personas for a cybersecurity SaaS startup.' },
+    { icon: <Building2 />, title: 'Competitor Battle Card', desc: 'Analyze how to win clients', prompt: 'Draft a competitor comparison battle card for an AI-powered customer support chatbot.' },
+    { icon: <Mail />, title: 'Outreach Strategy', desc: 'Convert cold leads into calls', prompt: 'Create a cold outreach sequence (LinkedIn + Cold Email) for selling IT recruitment services.' },
   ],
 };
 
@@ -134,7 +141,7 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
           endpoint = '/api/ai-agents/recruitment/chat-simple';
           body = { message: text, userId: user?.id };
         }
-      } else if (selectedAgent === 'sales') {
+      } else if (selectedAgent === 'sales' || selectedAgent === 'growth') {
         body = { message: text, conversationHistory: messages.map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.content })), userId: user?.id };
       } else {
         body = { query: text, conversationHistory: messages.map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.content })), userId: user?.id };
@@ -158,6 +165,9 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
       } else if (selectedAgent === 'sales') {
         setMessages(prev => [...prev, { role: 'ai', content: data.reply || 'Done!', extra: data.email }]);
         logToDb({ message: `Sales: ${text.substring(0, 60)}` }, { reply: data.reply });
+      } else if (selectedAgent === 'growth') {
+        setMessages(prev => [...prev, { role: 'ai', content: data.reply || 'Analysis complete.', extra: data.insights }]);
+        logToDb({ message: `Growth: ${text.substring(0, 60)}` }, { reply: data.reply, insights: data.insights });
       } else if (selectedAgent === 'prospect') {
         setMessages(prev => [...prev, { role: 'ai', content: data.reply || 'Found prospects!', extra: data.prospects }]);
         logToDb({ message: `Prospect search: ${text.substring(0, 60)}` }, { count: data.prospects?.length });
@@ -296,6 +306,39 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
                       <div style={{ fontWeight: 500, fontSize: 14, color: 'var(--text-1)', marginBottom: 16 }}>{m.extra.subject}</div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', marginBottom: 4 }}>BODY</div>
                       <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-2)', whiteSpace: 'pre-wrap' }}>{m.extra.body}</div>
+                    </div>
+                  )}
+
+                  {/* Growth Insights Card */}
+                  {m.role === 'ai' && m.extra && !Array.isArray(m.extra) && (m.extra.topInsight || m.extra.urgentAction || m.extra.biggestOpportunity) && (
+                    <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                      {m.extra.topInsight && (
+                        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(79, 70, 229, 0.25)', borderRadius: 12, padding: 16 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: '#4f46e5' }}>
+                            <Lightbulb size={16}/>
+                            <span style={{ fontSize: 11, fontWeight: 700 }}>TOP INSIGHT</span>
+                          </div>
+                          <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5 }}>{m.extra.topInsight}</div>
+                        </div>
+                      )}
+                      {m.extra.urgentAction && (
+                        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: 12, padding: 16 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: '#f59e0b' }}>
+                            <Zap size={16}/>
+                            <span style={{ fontSize: 11, fontWeight: 700 }}>URGENT ACTION</span>
+                          </div>
+                          <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5 }}>{m.extra.urgentAction}</div>
+                        </div>
+                      )}
+                      {m.extra.biggestOpportunity && (
+                        <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(16, 185, 129, 0.25)', borderRadius: 12, padding: 16 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, color: '#10b981' }}>
+                            <Star size={16}/>
+                            <span style={{ fontSize: 11, fontWeight: 700 }}>BIGGEST OPPORTUNITY</span>
+                          </div>
+                          <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5 }}>{m.extra.biggestOpportunity}</div>
+                        </div>
+                      )}
                     </div>
                   )}
 

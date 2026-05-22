@@ -17,7 +17,7 @@ type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'histo
 
 export default function Home() {
   const [view, setView] = useState<View>('chat');
-  const [selectedAgent, setSelectedAgent] = useState<'recruitment' | 'sales' | 'prospect'>('recruitment');
+  const [selectedAgent, setSelectedAgent] = useState<'recruitment' | 'sales' | 'prospect' | 'growth'>('recruitment');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -37,6 +37,16 @@ export default function Home() {
       setUser(session?.user ?? null);
     });
     return () => subscription.unsubscribe();
+  }, []);
+
+  /* ── Lock html/body for workspace ── */
+  useEffect(() => {
+    document.documentElement.classList.add('workspace-locked');
+    document.body.classList.add('workspace-locked');
+    return () => {
+      document.documentElement.classList.remove('workspace-locked');
+      document.body.classList.remove('workspace-locked');
+    };
   }, []);
 
   /* ── Counts from Supabase ── */
@@ -83,7 +93,7 @@ export default function Home() {
     setSidebarOpen(false);
   };
 
-  const launchAgent = (agent: 'recruitment' | 'sales' | 'prospect') => {
+  const launchAgent = (agent: 'recruitment' | 'sales' | 'prospect' | 'growth') => {
     setSelectedAgent(agent);
     setView('chat');
     setSidebarOpen(false);
@@ -172,7 +182,7 @@ export default function Home() {
           {view === 'prospect' && <ProspectFinder onLaunch={() => launchAgent('prospect')} />}
           {view === 'history' && <AgentHistory />}
           {view === 'pipeline' && user && <RecruitmentDashboard />}
-          {view === 'growth' && <GrowthAgent user={user} />}
+          {view === 'growth' && <GrowthAgent user={user} onLaunch={() => launchAgent('growth')} />}
 
           {/* Guard: dashboard requires login */}
           {view === 'dashboard' && !user && (

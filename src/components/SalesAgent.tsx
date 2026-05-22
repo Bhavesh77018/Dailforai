@@ -8,20 +8,20 @@ interface Props {
 
 export default function SalesAgent({ onLaunch }: Props) {
   return (
-    <div className="fade-in" style={{ padding: '80px 40px', maxWidth: 1100, margin: '0 auto', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="fade-in" style={{ padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', maxWidth: 1100, margin: '0 auto', width: '100%', height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
       
       {/* Hero Section */}
-      <div style={{ textAlign: 'center', marginBottom: 80, animation: 'slideUp 0.6s ease-out' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: 999, fontSize: 13, fontWeight: 600, color: '#f59e0b', marginBottom: 32 }}>
+      <div style={{ textAlign: 'center', marginBottom: 'clamp(40px, 8vw, 80px)', animation: 'slideUp 0.6s ease-out' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: 999, fontSize: 13, fontWeight: 600, color: '#f59e0b', marginBottom: 24 }}>
           <Mail size={16} /> Autonomous AI Agent
         </div>
         
-        <h1 style={{ fontSize: 56, fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 24, lineHeight: 1.1 }}>
+        <h1 style={{ fontSize: 'clamp(28px, 6vw, 56px)', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 20, lineHeight: 1.1 }}>
           AI Outreach <br/>
           <span style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>That Actually Converts.</span>
         </h1>
         
-        <p style={{ fontSize: 19, color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 650, margin: '0 auto 40px' }}>
+        <p style={{ fontSize: 'clamp(15px, 2vw, 19px)', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 650, margin: '0 auto 32px' }}>
           DialforAI generates hyper-personalized cold emails, follow-ups, and LinkedIn messages. It automatically adapts tone, structure, and Call-To-Action based on your target prospect.
         </p>
 
@@ -32,7 +32,7 @@ export default function SalesAgent({ onLaunch }: Props) {
 
       {/* Feature Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, animation: 'slideUp 0.8s ease-out' }}>
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <Edit3 size={24} />
           </div>
@@ -40,7 +40,7 @@ export default function SalesAgent({ onLaunch }: Props) {
           <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Generates highly personalized B2B cold emails tailored to keep word count under 200, maximizing reply probability with high-impact subject lines.</p>
         </div>
         
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <Share2 size={24} />
           </div>
@@ -48,7 +48,7 @@ export default function SalesAgent({ onLaunch }: Props) {
           <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Intelligently re-engages silent prospects with context-aware follow-up messages that build upon previous communications without being pushy.</p>
         </div>
 
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <Target size={24} />
           </div>
@@ -58,10 +58,10 @@ export default function SalesAgent({ onLaunch }: Props) {
       </div>
 
       {/* How to Use Section */}
-      <div style={{ marginTop: 100, borderTop: '1px solid var(--border)', paddingTop: 80, paddingBottom: 60, animation: 'slideUp 1s ease-out' }}>
-        <h2 style={{ fontSize: 32, fontWeight: 800, textAlign: 'center', marginBottom: 48 }}>How to use the Sales Agent</h2>
+      <div style={{ marginTop: 'clamp(50px, 10vw, 100px)', borderTop: '1px solid var(--border)', paddingTop: 'clamp(40px, 8vw, 80px)', paddingBottom: 'clamp(30px, 6vw, 60px)', animation: 'slideUp 1s ease-out' }}>
+        <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, textAlign: 'center', marginBottom: 'clamp(24px, 5vw, 48px)' }}>How to use the Sales Agent</h2>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 32, maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'clamp(20px, 4vw, 32px)', maxWidth: 900, margin: '0 auto' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--bg-btn)', color: 'var(--text-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, marginBottom: 16 }}>1</div>
             <h4 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Define Your Target</h4>

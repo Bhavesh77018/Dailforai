@@ -8,20 +8,20 @@ interface Props {
 
 export default function ProspectFinder({ onLaunch }: Props) {
   return (
-    <div className="fade-in" style={{ padding: '80px 40px', maxWidth: 1100, margin: '0 auto', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="fade-in" style={{ padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', maxWidth: 1100, margin: '0 auto', width: '100%', height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
       
       {/* Hero Section */}
-      <div style={{ textAlign: 'center', marginBottom: 80, animation: 'slideUp 0.6s ease-out' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: 'rgba(52, 211, 153, 0.1)', border: '1px solid rgba(52, 211, 153, 0.2)', borderRadius: 999, fontSize: 13, fontWeight: 600, color: '#10b981', marginBottom: 32 }}>
+      <div style={{ textAlign: 'center', marginBottom: 'clamp(40px, 8vw, 80px)', animation: 'slideUp 0.6s ease-out' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: 'rgba(52, 211, 153, 0.1)', border: '1px solid rgba(52, 211, 153, 0.2)', borderRadius: 999, fontSize: 13, fontWeight: 600, color: '#10b981', marginBottom: 24 }}>
           <Search size={16} /> Autonomous AI Agent
         </div>
         
-        <h1 style={{ fontSize: 56, fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 24, lineHeight: 1.1 }}>
+        <h1 style={{ fontSize: 'clamp(28px, 6vw, 56px)', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 20, lineHeight: 1.1 }}>
           Discover Target Prospects <br/>
           <span style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>In Real-Time.</span>
         </h1>
         
-        <p style={{ fontSize: 19, color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 650, margin: '0 auto 40px' }}>
+        <p style={{ fontSize: 'clamp(15px, 2vw, 19px)', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 650, margin: '0 auto 32px' }}>
           DialforAI acts as your autonomous research assistant. Provide natural language descriptions of your ideal customer profile, and it executes live web queries to find the exact decision makers.
         </p>
 
@@ -32,7 +32,7 @@ export default function ProspectFinder({ onLaunch }: Props) {
 
       {/* Feature Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, animation: 'slideUp 0.8s ease-out' }}>
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(52, 211, 153, 0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <Globe size={24} />
           </div>
@@ -40,7 +40,7 @@ export default function ProspectFinder({ onLaunch }: Props) {
           <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Performs real-time research across the internet, synthesizing data from professional networks and company pages to find fresh contact details.</p>
         </div>
         
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <Filter size={24} />
           </div>
@@ -48,7 +48,7 @@ export default function ProspectFinder({ onLaunch }: Props) {
           <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Understand complex natural language instructions. Filter targets by precise criteria like industry, company size, revenue, region, or tech stack.</p>
         </div>
 
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <Users size={24} />
           </div>
@@ -58,10 +58,10 @@ export default function ProspectFinder({ onLaunch }: Props) {
       </div>
 
       {/* How to Use Section */}
-      <div style={{ marginTop: 100, borderTop: '1px solid var(--border)', paddingTop: 80, paddingBottom: 60, animation: 'slideUp 1s ease-out' }}>
-        <h2 style={{ fontSize: 32, fontWeight: 800, textAlign: 'center', marginBottom: 48 }}>How to use the Prospect Finder</h2>
+      <div style={{ marginTop: 'clamp(50px, 10vw, 100px)', borderTop: '1px solid var(--border)', paddingTop: 'clamp(40px, 8vw, 80px)', paddingBottom: 'clamp(30px, 6vw, 60px)', animation: 'slideUp 1s ease-out' }}>
+        <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, textAlign: 'center', marginBottom: 'clamp(24px, 5vw, 48px)' }}>How to use the Prospect Finder</h2>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 32, maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'clamp(20px, 4vw, 32px)', maxWidth: 900, margin: '0 auto' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--bg-btn)', color: 'var(--text-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, marginBottom: 16 }}>1</div>
             <h4 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Define your ICP</h4>

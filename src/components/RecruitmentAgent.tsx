@@ -8,20 +8,20 @@ interface Props {
 
 export default function RecruitmentAgent({ onLaunch }: Props) {
   return (
-    <div className="fade-in" style={{ padding: '80px 40px', maxWidth: 1100, margin: '0 auto', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="fade-in" style={{ padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', maxWidth: 1100, margin: '0 auto', width: '100%', height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
       
       {/* Hero Section */}
-      <div style={{ textAlign: 'center', marginBottom: 80, animation: 'slideUp 0.6s ease-out' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: 'rgba(79, 70, 229, 0.1)', border: '1px solid rgba(79, 70, 229, 0.2)', borderRadius: 999, fontSize: 13, fontWeight: 600, color: 'var(--color-recruit)', marginBottom: 32 }}>
+      <div style={{ textAlign: 'center', marginBottom: 'clamp(40px, 8vw, 80px)', animation: 'slideUp 0.6s ease-out' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: 'rgba(79, 70, 229, 0.1)', border: '1px solid rgba(79, 70, 229, 0.2)', borderRadius: 999, fontSize: 13, fontWeight: 600, color: 'var(--color-recruit)', marginBottom: 24 }}>
           <Users size={16} /> Autonomous AI Agent
         </div>
         
-        <h1 style={{ fontSize: 56, fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 24, lineHeight: 1.1 }}>
+        <h1 style={{ fontSize: 'clamp(28px, 6vw, 56px)', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 20, lineHeight: 1.1 }}>
           Candidate Intelligence, <br/>
           <span style={{ background: 'linear-gradient(135deg, #4f46e5, #ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Fully Automated.</span>
         </h1>
         
-        <p style={{ fontSize: 19, color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 650, margin: '0 auto 40px' }}>
+        <p style={{ fontSize: 'clamp(15px, 2vw, 19px)', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 650, margin: '0 auto 32px' }}>
           DialforAI uses advanced multi-pass extraction to build structured profiles from LinkedIn, GitHub, and Naukri. It conducts interviews, detects cheating, and scores candidates on a transparent rubric.
         </p>
 
@@ -31,8 +31,8 @@ export default function RecruitmentAgent({ onLaunch }: Props) {
       </div>
 
       {/* Feature Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24, animation: 'slideUp 0.8s ease-out' }}>
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, animation: 'slideUp 0.8s ease-out' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(79, 70, 229, 0.1)', color: 'var(--color-recruit)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <Search size={24} />
           </div>
@@ -40,7 +40,7 @@ export default function RecruitmentAgent({ onLaunch }: Props) {
           <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Extracts comprehensive data from LinkedIn, GitHub, and Naukri simultaneously using dual-pass intelligence.</p>
         </div>
         
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <BrainCircuit size={24} />
           </div>
@@ -48,7 +48,7 @@ export default function RecruitmentAgent({ onLaunch }: Props) {
           <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Conducts 3–5 tailored technical Q&A questions automatically based on the job spec non-negotiables.</p>
         </div>
 
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <ShieldCheck size={24} />
           </div>
@@ -56,7 +56,7 @@ export default function RecruitmentAgent({ onLaunch }: Props) {
           <p style={{ color: 'var(--text-2)', lineHeight: 1.6, fontSize: 15 }}>Real-time anomaly detection flags robotic or copy-paste answers, penalizing candidate scores dynamically.</p>
         </div>
 
-        <div className="feature-card-premium" style={{ padding: 40, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
+        <div className="feature-card-premium" style={{ padding: 'clamp(20px, 4vw, 40px)', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, transition: 'all 0.3s' }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
             <Zap size={24} />
           </div>
@@ -66,10 +66,10 @@ export default function RecruitmentAgent({ onLaunch }: Props) {
       </div>
 
       {/* How to Use Section */}
-      <div style={{ marginTop: 100, borderTop: '1px solid var(--border)', paddingTop: 80, paddingBottom: 60, animation: 'slideUp 1s ease-out' }}>
-        <h2 style={{ fontSize: 32, fontWeight: 800, textAlign: 'center', marginBottom: 48 }}>How to use the Recruitment Agent</h2>
+      <div style={{ marginTop: 'clamp(50px, 10vw, 100px)', borderTop: '1px solid var(--border)', paddingTop: 'clamp(40px, 8vw, 80px)', paddingBottom: 'clamp(30px, 6vw, 60px)', animation: 'slideUp 1s ease-out' }}>
+        <h2 style={{ fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, textAlign: 'center', marginBottom: 'clamp(24px, 5vw, 48px)' }}>How to use the Recruitment Agent</h2>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 32, maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'clamp(20px, 4vw, 32px)', maxWidth: 900, margin: '0 auto' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--bg-btn)', color: 'var(--text-1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, marginBottom: 16 }}>1</div>
             <h4 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Paste a Profile URL</h4>

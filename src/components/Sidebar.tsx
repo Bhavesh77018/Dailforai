@@ -66,12 +66,14 @@ export default function Sidebar({ activeView, onNavigate, isOpen, isCollapsed, u
   const agentColor = (agent: string) => {
     if (agent === 'recruitment') return 'var(--color-recruit)';
     if (agent === 'sales') return 'var(--color-sales)';
+    if (agent === 'growth') return '#10b981';
     return 'var(--color-prospect)';
   };
 
   const agentLabel = (agent: string) => {
     if (agent === 'recruitment') return 'Recruit';
     if (agent === 'sales') return 'Sales';
+    if (agent === 'growth') return 'Growth';
     return 'Prospect';
   };
 
