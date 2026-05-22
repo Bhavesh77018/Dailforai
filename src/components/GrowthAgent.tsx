@@ -20,33 +20,36 @@ interface GrowthForm {
 }
 
 interface Lead {
-  company: string; industry: string; location: string; size: string;
-  score: number; whyMatch: string; hiringSignal: string;
-  contactType: string; linkedinSearch: string; outreachAngle: string;
+  company: string; industry: string; subIndustry?: string; location: string; size: string;
+  estimatedRevenue?: string; score: number; scoreReason?: string;
+  whyMatch: string; hiringSignal: string; urgencyLevel?: string;
+  contactType: string; contactDepartment?: string; linkedinSearch: string;
+  outreachAngle: string; estimatedDealValue?: string;
 }
 
 interface AnalysisData {
-  companyProfile: { overview: string; coreServices: string[]; targetMarkets: string[]; valueProposition: string };
-  icp: { idealClients: any[]; buyerPersonas: any[]; painPoints: string[] };
-  marketOpportunity: { summary: string; estimatedMarketSize: string; growthRecommendations: string[] };
+  companyProfile: { overview: string; coreServices: string[]; targetMarkets: string[]; valueProposition: string; currentGrowthStage?: string; revenueModel?: string };
+  icp: { idealClients: any[]; buyerPersonas: any[]; painPoints: string[]; idealDealSize?: string; salesCycleLength?: string };
+  marketOpportunity: { summary: string; estimatedMarketSize: string; addressableSegment?: string; keyTrend1?: string; keyTrend2?: string; keyTrend3?: string; growthRecommendations: string[] };
   leads: Lead[];
   competitors: any[];
-  outreachIntelligence: { bestContacts: any[]; coldEmailTemplate: string; linkedinMessage: string; followUpStrategy: string[] };
-  growthStrategy: { immediate: string[]; shortTerm: string[]; longTerm: string[] };
-  insights: { topInsight: string; urgentAction: string; biggestOpportunity: string; warningSign: string };
+  outreachIntelligence: { bestContacts: any[]; coldEmailTemplate: string; linkedinMessage: string; subjectLineVariants?: string[]; followUpStrategy: string[]; doNotDo?: string[] };
+  growthStrategy: { immediate: string[]; shortTerm: string[]; longTerm: string[]; quickWins?: string[]; channelStrategy?: { primaryChannel: string; secondaryChannel: string; reasoning: string } };
+  insights: { topInsight: string; urgentAction: string; biggestOpportunity: string; warningSign: string; competitiveAdvantage?: string; northStar?: string };
 }
 
 /* ─── Helpers ─────────────────────────────────────────────────── */
-const scoreColor = (s: number) => s >= 90 ? '#10b981' : s >= 75 ? '#f59e0b' : s >= 60 ? '#f97316' : '#ef4444';
-const scoreLabel = (s: number) => s >= 90 ? 'Hot Lead' : s >= 75 ? 'Strong' : s >= 60 ? 'Moderate' : 'Cold';
-const scoreGradient = (s: number) => s >= 90 ? 'rgba(16,185,129,0.1)' : s >= 75 ? 'rgba(245,158,11,0.1)' : 'rgba(249,115,22,0.1)';
+const scoreColor = (s: number) => s >= 90 ? '#10b981' : s >= 75 ? '#f59e0b' : s >= 65 ? '#f97316' : '#ef4444';
+const scoreLabel = (s: number) => s >= 90 ? '🔥 Hot' : s >= 75 ? '⭐ Strong' : s >= 65 ? 'Moderate' : 'Low';
+const scoreGradient = (s: number) => s >= 90 ? 'rgba(16,185,129,0.08)' : s >= 75 ? 'rgba(245,158,11,0.08)' : 'rgba(249,115,22,0.08)';
+const urgencyColor = (u?: string) => u === 'High' ? '#ef4444' : u === 'Medium' ? '#f59e0b' : '#6b7280';
 
 const TABS = [
-  { id: 'leads',      label: 'Lead Discovery',    icon: <Target size={14}/> },
-  { id: 'icp',        label: 'ICP & Personas',     icon: <Users size={14}/> },
-  { id: 'competitors',label: 'Competitors',         icon: <TrendingDown size={14}/> },
-  { id: 'outreach',   label: 'Outreach Intel',      icon: <Mail size={14}/> },
-  { id: 'strategy',   label: 'Growth Strategy',     icon: <Rocket size={14}/> },
+  { id: 'leads',      label: 'Lead Discovery',  icon: <Target size={14}/> },
+  { id: 'icp',        label: 'ICP & Personas',   icon: <Users size={14}/> },
+  { id: 'competitors',label: 'Competitors',       icon: <TrendingDown size={14}/> },
+  { id: 'outreach',   label: 'Outreach Intel',    icon: <Mail size={14}/> },
+  { id: 'strategy',   label: 'Growth Strategy',   icon: <Rocket size={14}/> },
 ];
 
 const INDUSTRY_OPTIONS = [

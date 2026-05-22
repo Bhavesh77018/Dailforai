@@ -164,7 +164,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {view === 'chat' && <ChatLanding onNavigate={navigate} onChatAction={handleChatAction} user={user} selectedAgent={selectedAgent} setSelectedAgent={setSelectedAgent} sessionId={sessionId} initialMessages={initialMessages} onNewChat={handleNewChat} />}
           {view === 'dashboard' && user && <Dashboard onNavigate={navigate} />}
           {view === 'recruitment' && <RecruitmentAgent onLaunch={() => launchAgent('recruitment')} />}
