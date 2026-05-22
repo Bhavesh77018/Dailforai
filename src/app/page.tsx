@@ -11,8 +11,9 @@ import SalesAgent from '@/components/SalesAgent';
 import ProspectFinder from '@/components/ProspectFinder';
 import AgentHistory from '@/components/AgentHistory';
 import RecruitmentDashboard from '@/components/RecruitmentDashboard';
+import GrowthAgent from '@/components/GrowthAgent';
 
-type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline';
+type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline' | 'growth';
 
 export default function Home() {
   const [view, setView] = useState<View>('chat');
@@ -171,6 +172,7 @@ export default function Home() {
           {view === 'prospect' && <ProspectFinder onLaunch={() => launchAgent('prospect')} />}
           {view === 'history' && <AgentHistory />}
           {view === 'pipeline' && user && <RecruitmentDashboard />}
+          {view === 'growth' && <GrowthAgent user={user} />}
 
           {/* Guard: dashboard requires login */}
           {view === 'dashboard' && !user && (

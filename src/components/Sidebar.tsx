@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Bot, MessageSquare, LayoutDashboard, Search, Users, Mail, Activity, LogOut, Hexagon, GitBranch, Clock, ChevronRight, Trash2, Plus } from 'lucide-react';
+import { Bot, MessageSquare, LayoutDashboard, Search, Users, Mail, Activity, LogOut, Hexagon, GitBranch, Clock, ChevronRight, Trash2, Plus, TrendingUp } from 'lucide-react';
 
-type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline';
+type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline' | 'growth';
 
 export interface ChatSession {
   id: string;
@@ -144,6 +144,12 @@ export default function Sidebar({ activeView, onNavigate, isOpen, isCollapsed, u
 
         <button className={`nav-item ${activeView === 'prospect' ? 'active' : ''}`} onClick={go('prospect')}>
           <Search size={16} /> Prospect Finder
+        </button>
+
+        <button className={`nav-item ${activeView === 'growth' ? 'active' : ''}`} onClick={go('growth')} style={{ position: 'relative' }}>
+          <TrendingUp size={16} />
+          Growth Intelligence
+          <span className="nav-badge" style={{ color: '#10b981', borderColor: 'rgba(16,185,129,0.2)', background: 'rgba(16,185,129,0.08)' }}>New</span>
         </button>
 
         <div className="nav-label" style={{ marginTop: 8 }}>DATA</div>
