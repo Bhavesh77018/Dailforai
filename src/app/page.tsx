@@ -71,7 +71,7 @@ export default function Home() {
   }, []);
 
   const navigate = (v: string) => {
-    if (v === 'dashboard' && !user) { setShowLogin(true); return; }
+    if ((v === 'dashboard' || v === 'pipeline') && !user) { setShowLogin(true); return; }
     setView(v as View);
     setSidebarOpen(false);
   };
@@ -181,7 +181,7 @@ export default function Home() {
           {view === 'sales' && <SalesAgent onLaunch={() => launchAgent('sales')} />}
           {view === 'prospect' && <ProspectFinder onLaunch={() => launchAgent('prospect')} />}
           {view === 'history' && <AgentHistory />}
-          {view === 'pipeline' && user && <RecruitmentDashboard />}
+          {view === 'pipeline' && user && <RecruitmentDashboard onLaunchRecruitment={() => launchAgent('recruitment')} />}
           {view === 'growth' && <GrowthAgent user={user} onLaunch={() => launchAgent('growth')} />}
 
           {/* Guard: dashboard requires login */}
@@ -190,6 +190,16 @@ export default function Home() {
               <div style={{ fontSize: 48 }}>🔐</div>
               <div style={{ fontSize: 20, fontWeight: 700 }}>Dashboard requires login</div>
               <div style={{ color: 'var(--text-2)' }}>Sign in to access your recruiter pipeline dashboard.</div>
+              <button className="btn btn-primary" onClick={() => setShowLogin(true)}>Sign In →</button>
+            </div>
+          )}
+
+          {/* Guard: pipeline requires login */}
+          {view === 'pipeline' && !user && (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, padding: 40 }}>
+              <div style={{ fontSize: 48 }}>🔐</div>
+              <div style={{ fontSize: 20, fontWeight: 700 }}>Recruitment Pipeline requires login</div>
+              <div style={{ color: 'var(--text-2)', textAlign: 'center' }}>Sign in to view job campaigns, candidate scores, and live interviews.</div>
               <button className="btn btn-primary" onClick={() => setShowLogin(true)}>Sign In →</button>
             </div>
           )}

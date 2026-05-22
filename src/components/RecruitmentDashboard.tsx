@@ -25,7 +25,11 @@ interface Candidate {
   created_at: string;
 }
 
-export default function RecruitmentDashboard() {
+interface Props {
+  onLaunchRecruitment?: () => void;
+}
+
+export default function RecruitmentDashboard({ onLaunchRecruitment }: Props) {
   const [jobs, setJobs] = useState<MagicLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<MagicLink | null>(null);
@@ -145,10 +149,19 @@ export default function RecruitmentDashboard() {
       </div>
 
       {jobs.length === 0 ? (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)', gap: 16 }}>
-          <Users size={48} style={{ opacity: 0.3 }} />
-          <div style={{ fontSize: 18, fontWeight: 600 }}>No job postings yet</div>
-          <div style={{ fontSize: 14 }}>Go to Chat → Recruitment Agent → "Post a job" to generate your first Magic Link</div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-2)', gap: 20, padding: 40 }}>
+          <Users size={64} style={{ strokeWidth: 1.5, color: 'var(--text-3)', opacity: 0.6 }} />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-1)', marginBottom: 8 }}>No job postings yet</div>
+            <div style={{ fontSize: 14, color: 'var(--text-3)', maxWidth: 400, lineHeight: 1.5 }}>
+              Create a job posting with our Recruitment Agent to generate your first screening link and track candidates.
+            </div>
+          </div>
+          {onLaunchRecruitment && (
+            <button className="btn btn-primary" onClick={onLaunchRecruitment}>
+              Talk to Recruitment Agent
+            </button>
+          )}
         </div>
       ) : (
         <div style={{ display: 'flex', flex: 1, gap: 20, minHeight: 0, paddingBottom: 24 }}>
