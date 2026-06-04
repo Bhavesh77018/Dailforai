@@ -72,7 +72,7 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
     }
   }, [initialMessages]);
 
-  // Save session to localStorage after every message
+  // Save session to DB + localStorage after every message
   useEffect(() => {
     if (!user?.id || messages.length === 0) return;
     const key = `sessions_${user.id}`;
@@ -80,6 +80,17 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
     // Derive title from first user message
     const firstUser = messages.find(m => m.role === 'user');
     const title = firstUser ? firstUser.content.substring(0, 42) + (firstUser.content.length > 42 ? '…' : '') : 'New Chat';
+    
+    // DB save (non-blocking)
+    supabase.from('chat_sessions').upsert({
+      id: sessionId,
+      user_id: user.id,
+      title,
+      agent: selectedAgent,
+      messages,
+      updated_at: new Date().toISOString()
+    }).then();
+
     const session = { id: sessionId, title, agent: selectedAgent, createdAt: new Date().toISOString(), messages };
     const withoutThis = existing.filter((s: any) => s.id !== sessionId);
     const updated = [session, ...withoutThis].slice(0, 30); // keep last 30 sessions

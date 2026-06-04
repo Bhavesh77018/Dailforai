@@ -51,7 +51,7 @@ export default function LoginModal({ onClose, onSuccess }: Props) {
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/`,
+          redirectTo: window.location.origin,
           scopes: provider === 'azure' ? 'email profile openid' : undefined,
         },
       });

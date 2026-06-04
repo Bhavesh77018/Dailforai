@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Bot, MessageSquare, LayoutDashboard, Search, Users, Mail, Activity, LogOut, Hexagon, GitBranch, Clock, ChevronRight, Trash2, Plus, TrendingUp, Briefcase } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline' | 'growth' | 'jobs';
 
@@ -26,7 +27,29 @@ interface Props {
   activeChatId: string | null;
 }
 
-function getStoredSessions(userId: string): ChatSession[] {
+async function getStoredSessions(userId: string): Promise<ChatSession[]> {
+  try {
+    // Try Supabase first
+    const { data, error } = await supabase
+      .from('chat_sessions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false })
+      .limit(30);
+
+    if (!error && data) {
+      // Map DB format to ChatSession
+      return data.map(d => ({
+        id: d.id,
+        title: d.title,
+        agent: d.agent,
+        createdAt: d.created_at,
+        messages: d.messages
+      }));
+    }
+  } catch {}
+
+  // Fallback to localStorage if table doesn't exist
   try {
     const raw = localStorage.getItem(`sessions_${userId}`);
     return raw ? JSON.parse(raw) : [];
@@ -40,7 +63,7 @@ export default function Sidebar({ activeView, onNavigate, isOpen, isCollapsed, u
   // Reload sessions whenever the sidebar opens or user changes
   useEffect(() => {
     if (user?.id) {
-      setSessions(getStoredSessions(user.id));
+      getStoredSessions(user.id).then(setSessions);
     } else {
       setSessions([]);
     }
@@ -50,14 +73,19 @@ export default function Sidebar({ activeView, onNavigate, isOpen, isCollapsed, u
   useEffect(() => {
     if (!user?.id) return;
     const t = setInterval(() => {
-      setSessions(getStoredSessions(user.id));
+      getStoredSessions(user.id).then(setSessions);
     }, 2000);
     return () => clearInterval(t);
   }, [user]);
 
-  const deleteSession = (e: React.MouseEvent, sessionId: string) => {
+  const deleteSession = async (e: React.MouseEvent, sessionId: string) => {
     e.stopPropagation();
     if (!user?.id) return;
+    
+    // Try DB first
+    await supabase.from('chat_sessions').delete().eq('id', sessionId).eq('user_id', user.id);
+    
+    // Always update local
     const updated = sessions.filter(s => s.id !== sessionId);
     localStorage.setItem(`sessions_${user.id}`, JSON.stringify(updated));
     setSessions(updated);
