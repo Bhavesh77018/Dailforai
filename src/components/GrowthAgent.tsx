@@ -146,31 +146,69 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
 
     if (!isLoggedIn || !isCompanyUser) {
       return (
-        <div className="fade-in" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', textAlign: 'center', overflowY: 'auto' }}>
+        <div className="fade-in" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', overflowY: 'auto' }}>
           
-          <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 2 }}>
-            <div style={{ width: 64, height: 64, borderRadius: 20, background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(59,130,246,0.1))', border: '1px solid rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-              <Building2 size={32} style={{ color: '#10b981' }} />
-            </div>
+          <div style={{ maxWidth: 1000, margin: '0 auto', width: '100%' }}>
             
-            <h2 style={{ fontSize: 'clamp(28px,5vw,48px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16, color: 'var(--text-1)', lineHeight: 1.1 }}>
-              Growth Intelligence is an<br/>
-              <span style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Enterprise-Only Feature</span>
-            </h2>
-            <p style={{ fontSize: 'clamp(13px,2.5vw,16px)', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 480, margin: '0 auto 8px' }}>
-              This AI-powered business growth suite is exclusively available to company accounts. It helps your team find leads, analyze competitors, and build outreach strategies.
-            </p>
-            {!isLoggedIn && (
-              <p style={{ fontSize: 13, color: 'var(--text-3)', marginBottom: 0 }}>Sign in with a company account to access all features.</p>
-            )}
-            {isLoggedIn && !isCompanyUser && (
-              <p style={{ fontSize: 13, color: 'var(--text-3)', marginBottom: 0 }}>You&apos;re logged in as an individual. Please create a company account to access Growth Intelligence.</p>
-            )}
-          </div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-            {['🔍 Lead Discovery', '🏢 Competitor Intel', '📈 Growth Strategy', '✉️ Outreach Automation'].map((t, i) => (
-              <div key={i} style={{ padding: '10px 18px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', fontSize: 13, color: 'var(--text-2)', fontWeight: 600 }}>{t}</div>
-            ))}
+            {/* Hero / Header Section */}
+            <div style={{ textAlign: 'center', marginBottom: 60, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ width: 72, height: 72, borderRadius: 20, background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(59,130,246,0.1))', border: '1px solid rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, boxShadow: '0 8px 30px rgba(16,185,129,0.15)' }}>
+                <TrendingUp size={36} style={{ color: '#10b981' }} />
+              </div>
+              
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', borderRadius: 999, fontSize: 12, fontWeight: 700, marginBottom: 16 }}>
+                <Lock size={14} /> Enterprise Feature
+              </div>
+
+              <h2 style={{ fontSize: 'clamp(32px,5vw,56px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 20, color: 'var(--text-1)', lineHeight: 1.1 }}>
+                Unlock your business potential with <br/>
+                <span style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Growth Intelligence</span>
+              </h2>
+              
+              <p style={{ fontSize: 'clamp(15px,2vw,18px)', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 640, margin: '0 auto 32px' }}>
+                Growth Intelligence is your autonomous Business Development Manager. Exclusively available to verified company accounts, it analyzes market gaps, builds highly-targeted Ideal Customer Profiles (ICPs), and generates outbound strategies on autopilot.
+              </p>
+
+              {!isLoggedIn ? (
+                <button className="btn btn-primary" onClick={() => {}} style={{ padding: '16px 40px', fontSize: 16, borderRadius: 14, display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 10px 30px rgba(16,185,129,0.3)', fontWeight: 700 }}>
+                  Create Company Account <ArrowRight size={18} />
+                </button>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                  <div style={{ padding: '12px 24px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', borderRadius: 12, border: '1px solid rgba(239,68,68,0.2)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <AlertTriangle size={18} /> You are logged in as an Individual. Company upgrade required.
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Feature Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 80 }}>
+              {[
+                { icon: <Target size={24}/>, title: 'ICP & Persona Mapping', desc: 'Stop guessing who your buyers are. The Growth Agent analyzes millions of data points to pinpoint exactly which industries and titles are ready to buy your services.', color: '#8b5cf6' },
+                { icon: <Building2 size={24}/>, title: 'Competitor Intel', desc: 'Instantly generate detailed competitor battlecards. Understand their pricing, product weaknesses, and exactly how your sales team should position against them.', color: '#3b82f6' },
+                { icon: <Users size={24}/>, title: 'Automated Lead Discovery', desc: 'Once your ICP is defined, the agent autonomously scours LinkedIn, Crunchbase, and job boards to build a live list of high-intent leads.', color: '#10b981' },
+                { icon: <Mail size={24}/>, title: 'Outreach Playbooks', desc: 'Generates hyper-personalized cold email templates, LinkedIn connection sequences, and objection-handling scripts tailored to your new leads.', color: '#ec4899' },
+              ].map((card, i) => (
+                <div key={i} style={{ padding: 32, borderRadius: 24, background: 'var(--bg-card)', border: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', top: 0, right: 0, width: 120, height: 120, background: `radial-gradient(circle at top right, ${card.color}20, transparent 70%)`, pointerEvents: 'none' }} />
+                  <div style={{ width: 48, height: 48, borderRadius: 14, background: `${card.color}15`, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>{card.icon}</div>
+                  <h3 style={{ fontWeight: 800, fontSize: 18, color: 'var(--text-1)', marginBottom: 12 }}>{card.title}</h3>
+                  <p style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.6 }}>{card.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Preview Banner */}
+            <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: 24, padding: '40px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: -100, left: '50%', transform: 'translateX(-50%)', width: 400, height: 400, background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0 }} />
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <ShieldCheck size={40} style={{ color: 'var(--text-3)', margin: '0 auto 20px' }} />
+                <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Ready to dominate your market?</h3>
+                <p style={{ color: 'var(--text-2)', marginBottom: 24, maxWidth: 500, margin: '0 auto' }}>Companies using DialforAI's Growth Intelligence see a 40% reduction in lead acquisition costs within the first quarter.</p>
+              </div>
+            </div>
+
           </div>
         </div>
       );
