@@ -4,24 +4,30 @@ import { supabase } from '@/lib/supabase';
 import {
   Briefcase, MapPin, Building2, Clock, Search, Filter,
   ChevronRight, X, Globe, Users, DollarSign, ExternalLink,
-  Sparkles, Tag, ArrowRight, BookOpen
+  Sparkles, Tag, ArrowRight, BookOpen, Bot
 } from 'lucide-react';
 
 interface Job {
   id: string;
   company_name: string;
   company_domain?: string;
+  company_logo?: string;
   title: string;
   description: string;
   location: string;
-  type: 'remote' | 'onsite' | 'hybrid';
+  type: string;
   salary_range?: string;
   industry?: string;
   skills?: string[];
   req_id?: string;
-  status: 'open' | 'closed';
+  status?: 'open' | 'closed';
   posted_by?: string;
   created_at: string;
+  is_external?: boolean;
+  source?: string;
+  source_color?: string;
+  source_url?: string;
+  external_url?: string;
 }
 
 const JOB_TYPES = ['All', 'Remote', 'Onsite', 'Hybrid'];
@@ -29,12 +35,14 @@ const INDUSTRIES = [
   'All Industries', 'IT Services', 'Healthcare', 'Manufacturing',
   'Finance', 'E-Commerce', 'SaaS', 'Consulting', 'BPO', 'Real Estate', 'Education'
 ];
-const TYPE_COLOR: Record<string, string> = {
-  remote: '#10b981', onsite: '#3b82f6', hybrid: '#f59e0b'
-};
-const TYPE_BG: Record<string, string> = {
-  remote: 'rgba(16,185,129,0.1)', onsite: 'rgba(59,130,246,0.1)', hybrid: 'rgba(245,158,11,0.1)'
-};
+
+function getTypeColor(type: string) {
+  const t = type.toLowerCase();
+  if (t.includes('remote')) return { color: '#10b981', bg: 'rgba(16,185,129,0.1)' };
+  if (t.includes('hybrid')) return { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' };
+  if (t.includes('onsite')) return { color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' };
+  return { color: 'var(--text-2)', bg: 'var(--bg-btn)' };
+}
 
 function timeAgo(date: string) {
   const diff = Date.now() - new Date(date).getTime();
@@ -55,68 +63,109 @@ export default function JobBoard({ user, onLoginClick }: Props) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [searchTrigger, setSearchTrigger] = useState(0); // To trigger refetch with search term
   const [typeFilter, setTypeFilter] = useState('All');
   const [industryFilter, setIndustryFilter] = useState('All Industries');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [applySuccess, setApplySuccess] = useState(false);
 
-  useEffect(() => { fetchJobs(); }, []);
+  useEffect(() => { fetchJobs(); }, [searchTrigger]);
 
   async function fetchJobs() {
     setLoading(true);
     try {
-      // Try to fetch from jobs table first
-      const { data, error } = await supabase
+      const internalJobs: Job[] = [];
+
+      // 1. Internal Jobs from `jobs` table
+      const { data: dbJobs, error } = await supabase
         .from('jobs')
         .select('*')
         .eq('status', 'open')
         .order('created_at', { ascending: false });
 
-      if (!error && data) {
-        setJobs(data);
-      } else {
-        // Fallback: pull from recruitment_magic_links (jobs posted via recruitment agent)
-        const { data: links } = await supabase
-          .from('recruitment_magic_links')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (links) {
-          setJobs(links.map((l: any) => ({
-            id: l.req_id,
-            company_name: l.company_name || 'Company',
-            company_domain: l.company_domain,
-            title: l.job_title || 'Open Position',
-            description: l.job_description || 'No description provided.',
-            location: l.location || 'Not specified',
-            type: (l.job_type as any) || 'onsite',
-            salary_range: l.salary_range,
-            industry: l.industry,
-            skills: l.skills || [],
-            req_id: l.req_id,
-            status: 'open',
-            created_at: l.created_at,
-          })));
-        }
+      if (!error && dbJobs) {
+        internalJobs.push(...dbJobs.map(j => ({
+          ...j, 
+          status: j.status as 'open' | 'closed',
+          is_external: false, 
+          source: 'DialforAI',
+          source_color: '#3b82f6'
+        })));
       }
+
+      // 2. Legacy internal jobs from `recruitment_magic_links`
+      const { data: links } = await supabase
+        .from('recruitment_magic_links')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (links) {
+        internalJobs.push(...links.map((l: any) => ({
+          id: `req-${l.req_id}`,
+          company_name: l.company_name || 'Company',
+          company_domain: l.company_domain,
+          title: l.job_title || 'Open Position',
+          description: l.job_description || 'No description provided.',
+          location: l.location || 'Not specified',
+          type: (l.job_type as any) || 'onsite',
+          salary_range: l.salary_range,
+          industry: l.industry,
+          skills: l.skills || [],
+          req_id: l.req_id,
+          status: 'open' as 'open',
+          created_at: l.created_at,
+          is_external: false,
+          source: 'DialforAI',
+          source_color: '#3b82f6'
+        })));
+      }
+
+      // 3. External Jobs
+      let externalJobs: Job[] = [];
+      try {
+        const extRes = await fetch(`/api/jobs/external?q=${encodeURIComponent(search)}`);
+        if (extRes.ok) {
+          const extData = await extRes.json();
+          externalJobs = extData.jobs || [];
+        }
+      } catch (err) {
+        console.error('Failed to fetch external jobs', err);
+      }
+
+      // Sort internal first, then by date. External sorted by date.
+      const sortedInternal = internalJobs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      const sortedExternal = externalJobs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      setJobs([...sortedInternal, ...sortedExternal]);
     } catch (e) {
       console.error('[JobBoard] error:', e);
     }
     setLoading(false);
   }
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchTrigger(prev => prev + 1);
+  };
+
   const filtered = jobs.filter(j => {
+    // Client-side filtering for immediate feedback, server filtering also applied on submit
     const q = search.toLowerCase();
     const matchSearch = !q || j.title.toLowerCase().includes(q) || j.company_name.toLowerCase().includes(q) || j.location.toLowerCase().includes(q);
-    const matchType = typeFilter === 'All' || j.type === typeFilter.toLowerCase();
+    const matchType = typeFilter === 'All' || j.type.toLowerCase().includes(typeFilter.toLowerCase());
     const matchIndustry = industryFilter === 'All Industries' || j.industry?.toLowerCase().includes(industryFilter.toLowerCase());
     return matchSearch && matchType && matchIndustry;
   });
 
   const handleApply = (job: Job) => {
-    if (job.req_id) {
+    if (job.is_external && job.external_url) {
+      // External Job -> new tab to original post
+      window.open(job.external_url, '_blank');
+    } else if (job.req_id) {
+      // Internal Job with Recruiter pipeline -> AI screening test
       window.open(`/apply/${job.req_id}`, '_blank');
     } else {
+      // Generic internal job without req_id (might need a generic screening flow later)
       setApplySuccess(true);
       setTimeout(() => setApplySuccess(false), 3000);
     }
@@ -134,7 +183,7 @@ export default function JobBoard({ user, onLoginClick }: Props) {
             <div>
               <h1 style={{ fontSize: 'clamp(18px,3vw,24px)', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-1)' }}>Find Jobs</h1>
               <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 1 }}>
-                {loading ? 'Loading...' : `${filtered.length} open position${filtered.length !== 1 ? 's' : ''}`}
+                {loading ? 'Loading...' : `${filtered.length} open position${filtered.length !== 1 ? 's' : ''} across the web`}
               </p>
             </div>
             {!user && (
@@ -148,15 +197,18 @@ export default function JobBoard({ user, onLoginClick }: Props) {
           </div>
 
           {/* Search & Filters */}
-          <div style={{ display: 'flex', gap: 10, marginTop: 16, marginBottom: 16, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, minWidth: 200, position: 'relative' }}>
+          <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: 10, marginTop: 16, marginBottom: 16, flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: 200, position: 'relative', display: 'flex' }}>
               <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-3)', pointerEvents: 'none' }} />
               <input
-                style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px 8px 34px', color: 'var(--text-1)', fontSize: 13, outline: 'none', fontFamily: 'inherit' }}
+                style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px 0 0 8px', padding: '8px 12px 8px 34px', color: 'var(--text-1)', fontSize: 13, outline: 'none', fontFamily: 'inherit' }}
                 placeholder="Search job title, company, location…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
+              <button type="submit" style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '0 8px 8px 0', padding: '0 16px', fontWeight: 600, cursor: 'pointer' }}>
+                Search
+              </button>
             </div>
             <select
               value={typeFilter}
@@ -172,7 +224,7 @@ export default function JobBoard({ user, onLoginClick }: Props) {
             >
               {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
             </select>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -185,20 +237,22 @@ export default function JobBoard({ user, onLoginClick }: Props) {
             {loading ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 80, flexDirection: 'column', gap: 16 }}>
                 <div className="typing-dots"><div className="typing-dot"/><div className="typing-dot"/><div className="typing-dot"/></div>
-                <span style={{ color: 'var(--text-3)', fontSize: 13 }}>Loading jobs…</span>
+                <span style={{ color: 'var(--text-3)', fontSize: 13 }}>Fetching latest jobs…</span>
               </div>
             ) : filtered.length === 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 80, gap: 16, color: 'var(--text-3)', textAlign: 'center' }}>
                 <Briefcase size={56} style={{ opacity: 0.25 }} />
                 <div>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-1)', marginBottom: 6 }}>No jobs posted yet</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-1)', marginBottom: 6 }}>No jobs found</div>
                   <div style={{ fontSize: 14, maxWidth: 320, lineHeight: 1.5 }}>
-                    Companies using DialforAI Recruitment Agent will post jobs here. Check back soon!
+                    Try adjusting your search criteria or removing filters.
                   </div>
                 </div>
               </div>
             ) : (
-              filtered.map(job => (
+              filtered.map(job => {
+                const tColor = getTypeColor(job.type);
+                return (
                 <button
                   key={job.id}
                   onClick={() => { setSelectedJob(job); setApplySuccess(false); }}
@@ -211,21 +265,38 @@ export default function JobBoard({ user, onLoginClick }: Props) {
                   }}
                 >
                   {/* Company Avatar */}
-                  <div style={{ width: 44, height: 44, borderRadius: 10, background: 'var(--bg-btn)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#3b82f6', flexShrink: 0 }}>
-                    {job.company_name[0].toUpperCase()}
+                  <div style={{ width: 44, height: 44, borderRadius: 10, background: 'var(--bg-btn)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: '#3b82f6', flexShrink: 0, overflow: 'hidden' }}>
+                    {job.company_logo ? (
+                      <img src={job.company_logo} alt={job.company_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      job.company_name[0].toUpperCase()
+                    )}
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-1)', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {job.title}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {job.title}
+                      </div>
+                      {job.is_external ? (
+                        <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 6, background: `${job.source_color}15`, color: job.source_color, border: `1px solid ${job.source_color}30`, flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <ExternalLink size={10} /> {job.source}
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 6, background: 'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(16,185,129,0.1))', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <Sparkles size={10} /> DialforAI Verified
+                        </span>
+                      )}
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Building2 size={11} /> {job.company_name}
+
+                    <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Building2 size={12} /> {job.company_name}</span>
                       <span style={{ color: 'var(--border-2)' }}>·</span>
-                      <MapPin size={11} /> {job.location}
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={12} /> {job.location}</span>
                     </div>
+
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 999, background: TYPE_BG[job.type] || 'var(--bg-btn)', color: TYPE_COLOR[job.type] || 'var(--text-2)' }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 999, background: tColor.bg, color: tColor.color }}>
                         {job.type.charAt(0).toUpperCase() + job.type.slice(1)}
                       </span>
                       {job.salary_range && (
@@ -242,7 +313,7 @@ export default function JobBoard({ user, onLoginClick }: Props) {
                     <ChevronRight size={14} style={{ color: 'var(--text-3)' }} />
                   </div>
                 </button>
-              ))
+              )})
             )}
           </div>
 
@@ -252,12 +323,26 @@ export default function JobBoard({ user, onLoginClick }: Props) {
               {/* Panel Header */}
               <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(59,130,246,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 800, color: '#3b82f6', flexShrink: 0 }}>
-                    {selectedJob.company_name[0].toUpperCase()}
+                  <div style={{ width: 56, height: 56, borderRadius: 12, background: 'var(--bg-btn)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 800, color: '#3b82f6', flexShrink: 0, overflow: 'hidden' }}>
+                    {selectedJob.company_logo ? (
+                      <img src={selectedJob.company_logo} alt={selectedJob.company_name} style={{ width: '100%', height: '100%', objectFit: 'cover', background: '#fff' }} />
+                    ) : (
+                      selectedJob.company_name[0].toUpperCase()
+                    )}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--text-1)', marginBottom: 2 }}>{selectedJob.title}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-2)' }}>{selectedJob.company_name}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                      <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--text-1)' }}>{selectedJob.title}</div>
+                      {!selectedJob.is_external && (
+                        <Sparkles size={14} color="#10b981" />
+                      )}
+                    </div>
+                    <div style={{ fontSize: 14, color: 'var(--text-2)' }}>
+                      {selectedJob.company_name} 
+                      {selectedJob.is_external && (
+                        <span style={{ color: 'var(--text-3)', marginLeft: 8 }}>via {selectedJob.source}</span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <button onClick={() => setSelectedJob(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center', padding: 4 }}>
@@ -269,7 +354,7 @@ export default function JobBoard({ user, onLoginClick }: Props) {
               <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
                 {/* Meta chips */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, padding: '4px 10px', borderRadius: 999, background: TYPE_BG[selectedJob.type], color: TYPE_COLOR[selectedJob.type], fontWeight: 600 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, padding: '4px 10px', borderRadius: 999, background: getTypeColor(selectedJob.type).bg, color: getTypeColor(selectedJob.type).color, fontWeight: 600 }}>
                     <Globe size={11} /> {selectedJob.type.charAt(0).toUpperCase() + selectedJob.type.slice(1)}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, padding: '4px 10px', borderRadius: 999, background: 'var(--bg-btn)', color: 'var(--text-2)' }}>
@@ -293,13 +378,13 @@ export default function JobBoard({ user, onLoginClick }: Props) {
                 {/* Description */}
                 <div style={{ marginBottom: 20 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: 0.8, marginBottom: 10 }}>JOB DESCRIPTION</div>
-                  <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{selectedJob.description}</div>
+                  <div style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{selectedJob.description}</div>
                 </div>
 
-                {/* Skills */}
+                {/* Skills/Tags */}
                 {selectedJob.skills && selectedJob.skills.length > 0 && (
                   <div style={{ marginBottom: 20 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: 0.8, marginBottom: 10 }}>REQUIRED SKILLS</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: 0.8, marginBottom: 10 }}>TAGS & SKILLS</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {selectedJob.skills.map((skill, i) => (
                         <span key={i} style={{ fontSize: 12, padding: '3px 10px', borderRadius: 999, background: 'rgba(79,70,229,0.1)', color: '#818cf8', border: '1px solid rgba(79,70,229,0.2)', fontWeight: 500 }}>
@@ -323,9 +408,20 @@ export default function JobBoard({ user, onLoginClick }: Props) {
                 {user ? (
                   <button
                     onClick={() => handleApply(selectedJob)}
-                    style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #3b82f6, #4f46e5)', color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: 'inherit' }}
+                    style={{ 
+                      width: '100%', padding: '14px', borderRadius: 10, 
+                      background: selectedJob.is_external ? 'var(--bg-btn)' : 'linear-gradient(135deg, #10b981, #059669)', 
+                      color: selectedJob.is_external ? 'var(--text-1)' : '#fff', 
+                      border: selectedJob.is_external ? '1px solid var(--border-2)' : 'none',
+                      fontWeight: 700, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: 'inherit',
+                      boxShadow: selectedJob.is_external ? 'none' : '0 4px 14px rgba(16,185,129,0.2)'
+                    }}
                   >
-                    Apply Now <ArrowRight size={16} />
+                    {selectedJob.is_external ? (
+                      <>Apply on {selectedJob.source} <ExternalLink size={16} /></>
+                    ) : (
+                      <>Take AI Screening Test <Bot size={18} /></>
+                    )}
                   </button>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
