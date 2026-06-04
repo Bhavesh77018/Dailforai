@@ -45,6 +45,24 @@ export default function LoginModal({ onClose, onSuccess }: Props) {
     setMode(m); setError(''); setSuccess('');
   };
 
+  const handleOAuth = async (provider: 'google' | 'azure') => {
+    setLoading(true); setError('');
+    try {
+      const { error: err } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/`,
+          scopes: provider === 'azure' ? 'email profile openid' : undefined,
+        },
+      });
+      if (err) throw err;
+      // Redirect happens automatically — browser leaves the page
+    } catch (e: any) {
+      setError(e.message || 'OAuth sign-in failed.');
+      setLoading(false);
+    }
+  };
+
   const handle = async () => {
     if (!email || !password) { setError('Please fill all required fields.'); return; }
 
@@ -209,7 +227,58 @@ export default function LoginModal({ onClose, onSuccess }: Props) {
           {loading ? <span className="spinner" /> : mode === 'login' ? '→ Sign In' : isCompany ? '→ Register Company' : '→ Create Account'}
         </button>
 
-        <div className="divider">or</div>
+        {/* OAuth Divider */}
+        <div className="divider">or continue with</div>
+
+        {/* Google OAuth */}
+        <button
+          onClick={() => handleOAuth('google')}
+          disabled={loading}
+          style={{
+            width: '100%', padding: '10px 16px', borderRadius: 8,
+            border: '1px solid var(--border)', background: 'var(--bg-btn)',
+            color: 'var(--text-1)', cursor: 'pointer', fontSize: 14, fontWeight: 600,
+            fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 10, marginBottom: 10, transition: 'all 0.2s',
+          }}
+          onMouseOver={e => (e.currentTarget.style.borderColor = 'var(--border-focus)')}
+          onMouseOut={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+        >
+          {/* Google Icon */}
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.79-.07-1.54-.19-2.27h-11.3v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/>
+            <path fill="#34A853" d="M12.255 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96h-3.98v3.09C3.515 21.3 7.615 24 12.255 24z"/>
+            <path fill="#FBBC05" d="M5.525 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62h-3.98a11.86 11.86 0 000 10.76l3.98-3.09z"/>
+            <path fill="#EA4335" d="M12.255 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C18.205 1.19 15.495 0 12.255 0c-4.64 0-8.74 2.7-10.71 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        {/* Microsoft OAuth */}
+        <button
+          onClick={() => handleOAuth('azure')}
+          disabled={loading}
+          style={{
+            width: '100%', padding: '10px 16px', borderRadius: 8,
+            border: '1px solid var(--border)', background: 'var(--bg-btn)',
+            color: 'var(--text-1)', cursor: 'pointer', fontSize: 14, fontWeight: 600,
+            fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 10, marginBottom: 16, transition: 'all 0.2s',
+          }}
+          onMouseOver={e => (e.currentTarget.style.borderColor = 'var(--border-focus)')}
+          onMouseOut={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+        >
+          {/* Microsoft Icon */}
+          <svg width="18" height="18" viewBox="0 0 23 23">
+            <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
+            <rect x="12" y="1" width="10" height="10" fill="#7FBA00"/>
+            <rect x="1" y="12" width="10" height="10" fill="#00A4EF"/>
+            <rect x="12" y="12" width="10" height="10" fill="#FFB900"/>
+          </svg>
+          Continue with Microsoft
+        </button>
+
+        <div className="divider">or use email</div>
 
         <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-2)' }}>
           {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
