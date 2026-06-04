@@ -44,13 +44,19 @@ export default function Home() {
 
   /* ── Lock html/body for workspace ── */
   useEffect(() => {
-    document.documentElement.classList.add('workspace-locked');
-    document.body.classList.add('workspace-locked');
+    if (view === 'landing') {
+      document.documentElement.classList.remove('workspace-locked');
+      document.body.classList.remove('workspace-locked');
+    } else {
+      document.documentElement.classList.add('workspace-locked');
+      document.body.classList.add('workspace-locked');
+    }
+    
     return () => {
       document.documentElement.classList.remove('workspace-locked');
       document.body.classList.remove('workspace-locked');
     };
-  }, []);
+  }, [view]);
 
   /* ── Counts from Supabase ── */
   useEffect(() => {
