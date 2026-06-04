@@ -57,12 +57,13 @@ function timeAgo(date: string) {
 interface Props {
   user: any;
   onLoginClick: () => void;
+  initialSearch?: string;
 }
 
-export default function JobBoard({ user, onLoginClick }: Props) {
+export default function JobBoard({ user, onLoginClick, initialSearch = '' }: Props) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(initialSearch);
   const [searchTrigger, setSearchTrigger] = useState(0); // To trigger refetch with search term
   const [typeFilter, setTypeFilter] = useState('All');
   const [industryFilter, setIndustryFilter] = useState('All Industries');

@@ -13,11 +13,13 @@ import AgentHistory from '@/components/AgentHistory';
 import RecruitmentDashboard from '@/components/RecruitmentDashboard';
 import GrowthAgent from '@/components/GrowthAgent';
 import JobBoard from '@/components/JobBoard';
+import Landing from '@/components/Landing';
 
-type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline' | 'growth' | 'jobs';
+type View = 'landing' | 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline' | 'growth' | 'jobs';
 
 export default function Home() {
-  const [view, setView] = useState<View>('chat');
+  const [view, setView] = useState<View>('landing');
+  const [initialJobQuery, setInitialJobQuery] = useState('');
   const [selectedAgent, setSelectedAgent] = useState<'recruitment' | 'sales' | 'prospect' | 'growth'>('recruitment');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -127,6 +129,20 @@ export default function Home() {
     return true; // allow chat
   };
 
+  if (view === 'landing') {
+    return (
+      <>
+        <Landing 
+          onLaunchChat={() => setView('chat')} 
+          onSearchJobs={(q) => { setInitialJobQuery(q); setView('jobs'); }} 
+        />
+        {showLogin && (
+          <LoginModal onClose={() => setShowLogin(false)} onSuccess={handleLoginSuccess} />
+        )}
+      </>
+    );
+  }
+
   return (
     <div className="app-shell">
       {/* Mobile overlay */}
@@ -184,7 +200,7 @@ export default function Home() {
           {view === 'history' && <AgentHistory />}
           {view === 'pipeline' && user && <RecruitmentDashboard onLaunchRecruitment={() => launchAgent('recruitment')} />}
           {view === 'growth' && <GrowthAgent user={user} onLaunch={() => launchAgent('growth')} />}
-          {view === 'jobs' && <JobBoard user={user} onLoginClick={() => setShowLogin(true)} />}
+          {view === 'jobs' && <JobBoard user={user} onLoginClick={() => setShowLogin(true)} initialSearch={initialJobQuery} />}
 
           {/* Guard: dashboard requires login */}
           {view === 'dashboard' && !user && (

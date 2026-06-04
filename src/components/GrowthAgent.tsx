@@ -4,7 +4,7 @@ import {
   TrendingUp, Building2, Target, Users, Mail, Search, AlertTriangle,
   CheckCircle2, ArrowRight, Zap, BarChart3, Lightbulb, ShieldCheck,
   Clock, Star, MapPin, Globe, Briefcase, ChevronDown, ChevronUp,
-  RefreshCw, Copy, Check, Rocket, Eye, Award, TrendingDown
+  RefreshCw, Copy, Check, Rocket, Eye, Award, TrendingDown, Lock
 } from 'lucide-react';
 
 /* ─── Types ───────────────────────────────────────────────────── */
@@ -146,13 +146,16 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
 
     if (!isLoggedIn || !isCompanyUser) {
       return (
-        <div className="fade-in" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', textAlign: 'center', gap: 24 }}>
-          <div style={{ width: 80, height: 80, borderRadius: 24, background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(59,130,246,0.15))', border: '1px solid rgba(16,185,129,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Building2 size={36} style={{ color: '#10b981' }} />
-          </div>
-          <div>
-            <h2 style={{ fontSize: 'clamp(22px,5vw,32px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 12, color: 'var(--text-1)' }}>
-              Growth Intelligence is for Companies
+        <div className="fade-in" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', textAlign: 'center', overflowY: 'auto' }}>
+          
+          <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 2 }}>
+            <div style={{ width: 64, height: 64, borderRadius: 20, background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(59,130,246,0.1))', border: '1px solid rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+              <Building2 size={32} style={{ color: '#10b981' }} />
+            </div>
+            
+            <h2 style={{ fontSize: 'clamp(28px,5vw,48px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16, color: 'var(--text-1)', lineHeight: 1.1 }}>
+              Growth Intelligence is an<br/>
+              <span style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Enterprise-Only Feature</span>
             </h2>
             <p style={{ fontSize: 'clamp(13px,2.5vw,16px)', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 480, margin: '0 auto 8px' }}>
               This AI-powered business growth suite is exclusively available to company accounts. It helps your team find leads, analyze competitors, and build outreach strategies.
