@@ -47,6 +47,75 @@ const SOURCES = [
     }),
     filterRaw: (data: any[]) => data.filter((j: any) => j && !j.legal && j.position),
   },
+  {
+    name: 'Jobicy',
+    color: '#3b82f6',
+    url: () => 'https://jobicy.com/api/v2/remote-jobs',
+    map: (j: any) => ({
+      id: `jobicy-${j.id}`,
+      source: 'Jobicy',
+      source_color: '#3b82f6',
+      source_url: 'https://jobicy.com',
+      external_url: j.url,
+      title: j.jobTitle,
+      company_name: j.companyName,
+      company_logo: j.companyLogo,
+      location: j.jobGeo || 'Remote',
+      type: 'remote',
+      salary_range: j.salaryMin && j.salaryMax ? `${j.salaryCurrency} ${j.salaryMin}-${j.salaryMax}` : null,
+      industry: Array.isArray(j.jobIndustry) ? j.jobIndustry[0] : null,
+      tags: Array.isArray(j.jobType) ? j.jobType : [],
+      description: j.jobDescription?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800) || '',
+      created_at: j.pubDate,
+    }),
+    extract: (data: any) => data.jobs || []
+  },
+  {
+    name: 'Arbeitnow',
+    color: '#8b5cf6',
+    url: () => 'https://www.arbeitnow.com/api/job-board-api',
+    map: (j: any) => ({
+      id: `arbeitnow-${j.slug}`,
+      source: 'Arbeitnow',
+      source_color: '#8b5cf6',
+      source_url: 'https://www.arbeitnow.com',
+      external_url: j.url,
+      title: j.title,
+      company_name: j.company_name,
+      company_logo: null,
+      location: j.location || 'Remote',
+      type: j.remote ? 'remote' : 'hybrid',
+      salary_range: null,
+      industry: Array.isArray(j.tags) ? j.tags[0] : null,
+      tags: Array.isArray(j.tags) ? j.tags.slice(0, 5) : [],
+      description: j.description?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800) || '',
+      created_at: j.created_at ? new Date(j.created_at * 1000).toISOString() : new Date().toISOString(),
+    }),
+    extract: (data: any) => data.data || []
+  },
+  {
+    name: 'Himalayas',
+    color: '#ef4444',
+    url: () => 'https://himalayas.app/jobs/api?limit=50',
+    map: (j: any) => ({
+      id: `himalayas-${j.applicationLink?.split('/').pop() || j.title.replace(/\\s+/g, '-')}`,
+      source: 'Himalayas',
+      source_color: '#ef4444',
+      source_url: 'https://himalayas.app',
+      external_url: j.applicationLink,
+      title: j.title,
+      company_name: j.companyName,
+      company_logo: j.companyLogo,
+      location: j.locationRestrictions?.length ? j.locationRestrictions.join(', ') : 'Remote',
+      type: 'remote',
+      salary_range: j.minSalary && j.maxSalary ? `${j.currency || '$'} ${j.minSalary}-${j.maxSalary}` : null,
+      industry: Array.isArray(j.categories) ? j.categories[0] : null,
+      tags: Array.isArray(j.categories) ? j.categories.slice(0, 5) : [],
+      description: j.description?.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 800) || '',
+      created_at: j.pubDate ? new Date(j.pubDate * 1000).toISOString() : new Date().toISOString(),
+    }),
+    extract: (data: any) => data.jobs || []
+  }
 ];
 
 export async function GET(req: Request) {
@@ -70,7 +139,7 @@ export async function GET(req: Request) {
           data = (src as any).filterRaw ? (src as any).filterRaw(data) : data.slice(1);
         }
 
-        const jobs = (src.name === 'Remotive' ? data.jobs : data) || [];
+        const jobs = (src as any).extract ? (src as any).extract(data) : (src.name === 'Remotive' ? data.jobs : data) || [];
         const mapped = jobs.slice(0, 30).map(src.map).filter((j: any) => j.title && j.company_name);
 
         // Client-side search filter for sources that don't support ?search=
