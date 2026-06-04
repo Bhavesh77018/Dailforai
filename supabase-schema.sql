@@ -72,3 +72,30 @@ ALTER TABLE sales_outreach ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow all" ON agent_runs FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all" ON prospects FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow all" ON sales_outreach FOR ALL USING (true) WITH CHECK (true);
+
+-- ============================================================
+-- Jobs Table (job board - posted by company users)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS jobs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_name TEXT NOT NULL,
+  company_domain TEXT,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  location TEXT NOT NULL DEFAULT 'Not specified',
+  type TEXT NOT NULL DEFAULT 'onsite' CHECK (type IN ('remote', 'onsite', 'hybrid')),
+  salary_range TEXT,
+  industry TEXT,
+  skills TEXT[] DEFAULT '{}',
+  req_id TEXT,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed')),
+  posted_by UUID,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+CREATE INDEX IF NOT EXISTS idx_jobs_created ON jobs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_jobs_company ON jobs(company_domain);
+
+ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all" ON jobs FOR ALL USING (true) WITH CHECK (true);

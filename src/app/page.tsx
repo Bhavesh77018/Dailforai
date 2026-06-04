@@ -12,8 +12,9 @@ import ProspectFinder from '@/components/ProspectFinder';
 import AgentHistory from '@/components/AgentHistory';
 import RecruitmentDashboard from '@/components/RecruitmentDashboard';
 import GrowthAgent from '@/components/GrowthAgent';
+import JobBoard from '@/components/JobBoard';
 
-type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline' | 'growth';
+type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline' | 'growth' | 'jobs';
 
 export default function Home() {
   const [view, setView] = useState<View>('chat');
@@ -183,6 +184,7 @@ export default function Home() {
           {view === 'history' && <AgentHistory />}
           {view === 'pipeline' && user && <RecruitmentDashboard onLaunchRecruitment={() => launchAgent('recruitment')} />}
           {view === 'growth' && <GrowthAgent user={user} onLaunch={() => launchAgent('growth')} />}
+          {view === 'jobs' && <JobBoard user={user} onLoginClick={() => setShowLogin(true)} />}
 
           {/* Guard: dashboard requires login */}
           {view === 'dashboard' && !user && (

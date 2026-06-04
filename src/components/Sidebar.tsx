@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Bot, MessageSquare, LayoutDashboard, Search, Users, Mail, Activity, LogOut, Hexagon, GitBranch, Clock, ChevronRight, Trash2, Plus, TrendingUp } from 'lucide-react';
+import { Bot, MessageSquare, LayoutDashboard, Search, Users, Mail, Activity, LogOut, Hexagon, GitBranch, Clock, ChevronRight, Trash2, Plus, TrendingUp, Briefcase } from 'lucide-react';
 
-type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline' | 'growth';
+type View = 'chat' | 'recruitment' | 'sales' | 'prospect' | 'dashboard' | 'history' | 'pipeline' | 'growth' | 'jobs';
 
 export interface ChatSession {
   id: string;
@@ -94,6 +94,11 @@ export default function Sidebar({ activeView, onNavigate, isOpen, isCollapsed, u
         <div className="nav-label">WORKSPACE</div>
         <button className={`nav-item ${activeView === 'chat' && !activeChatId ? 'active' : ''}`} onClick={go('chat')}>
           <Bot size={16} /> Chat
+        </button>
+
+        <button className={`nav-item ${activeView === 'jobs' ? 'active' : ''}`} onClick={go('jobs')}>
+          <Briefcase size={16} /> Find Jobs
+          <span className="nav-badge" style={{ color: '#3b82f6', borderColor: 'rgba(59,130,246,0.2)', background: 'rgba(59,130,246,0.08)', marginLeft: 'auto' }}>New</span>
         </button>
 
         {user && (
