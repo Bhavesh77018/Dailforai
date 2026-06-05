@@ -37,10 +37,15 @@ export default function Home() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      const isLoggingIn = !user && session?.user;
       setUser(session?.user ?? null);
+      if (isLoggingIn && view === 'landing') {
+        setView('chat');
+        setShowLogin(false);
+      }
     });
     return () => subscription.unsubscribe();
-  }, []);
+  }, [user, view]);
 
   /* ── Lock html/body for workspace ── */
   useEffect(() => {

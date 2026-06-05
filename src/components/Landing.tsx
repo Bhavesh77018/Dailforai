@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Hexagon, Users, Search, TrendingUp, ArrowRight, Zap, ShieldCheck, BrainCircuit, Bot, Code, Sparkles, Cpu, Menu, X, Mail, Briefcase, MapPin, Building2, ChevronRight } from 'lucide-react';
 
@@ -10,6 +10,19 @@ interface LandingProps {
 export default function Landing({ onLaunchChat, onSearchJobs }: LandingProps) {
   const [jobQuery, setJobQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/jobs/external')
+      .then(res => res.json())
+      .then(data => {
+        if (data.jobs && data.jobs.length > 0) {
+          // Get the first 3 jobs
+          setFeaturedJobs(data.jobs.slice(0, 3));
+        }
+      })
+      .catch(err => console.error("Failed to fetch featured jobs:", err));
+  }, []);
 
   const handleChat = () => {
     if (onLaunchChat) onLaunchChat();
@@ -39,7 +52,7 @@ export default function Landing({ onLaunchChat, onSearchJobs }: LandingProps) {
           <a href="#jobs" style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-1)', textDecoration: 'none' }}>Jobs</a>
           <Link href="/contact" style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-2)', textDecoration: 'none' }}>Contact</Link>
           <button className="btn btn-outline" onClick={handleChat} style={{ padding: '8px 16px', fontSize: 13, borderRadius: 8 }}>
-            Sign In
+            Chat with Agent
           </button>
         </div>
 
@@ -59,7 +72,7 @@ export default function Landing({ onLaunchChat, onSearchJobs }: LandingProps) {
           <a href="#agents" onClick={() => setMenuOpen(false)} style={{ padding: '12px 8px', fontSize: 15, fontWeight: 600, color: 'var(--text-1)', textDecoration: 'none' }}>Agents</a>
           <a href="#jobs" onClick={() => setMenuOpen(false)} style={{ padding: '12px 8px', fontSize: 15, fontWeight: 600, color: 'var(--text-1)', textDecoration: 'none' }}>Jobs</a>
           <Link href="/contact" onClick={() => setMenuOpen(false)} style={{ padding: '12px 8px', fontSize: 15, fontWeight: 500, color: 'var(--text-2)', textDecoration: 'none' }}>Contact</Link>
-          <button onClick={() => { setMenuOpen(false); handleChat(); }} className="btn btn-primary" style={{ marginTop: 8, padding: '12px', borderRadius: 8, fontSize: 14, textAlign: 'center', justifyContent: 'center' }}>Sign In</button>
+          <button onClick={() => { setMenuOpen(false); handleChat(); }} className="btn btn-primary" style={{ marginTop: 8, padding: '12px', borderRadius: 8, fontSize: 14, textAlign: 'center', justifyContent: 'center' }}>Chat with Agent</button>
         </div>
       )}
 
@@ -125,30 +138,43 @@ export default function Landing({ onLaunchChat, onSearchJobs }: LandingProps) {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
-            {[
-              { title: 'Senior Frontend Engineer', company: 'DialforAI', location: 'Remote', salary: '$120k - $150k', tags: ['React', 'Next.js', 'AI'] },
-              { title: 'Machine Learning Architect', company: 'DataSync', location: 'New York / Remote', salary: '$160k - $200k', tags: ['Python', 'LLMs', 'PyTorch'] },
-              { title: 'Director of Outbound Sales', company: 'Infinity STS', location: 'Remote', salary: '$100k + Commission', tags: ['B2B', 'Salesforce', 'Leadership'] }
-            ].map((job, i) => (
-              <div key={i} onClick={() => handleSearch(undefined, job.title)} style={{ padding: 24, background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', flexDirection: 'column', gap: 16 }} className="hover-card">
-                <div>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>{job.title}</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-2)', fontSize: 13 }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Building2 size={14}/> {job.company}</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={14}/> {job.location}</span>
+            {featuredJobs.length > 0 ? (
+              featuredJobs.map((job, i) => (
+                <div key={i} onClick={() => window.open(job.external_url, '_blank')} style={{ padding: 24, background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: 16, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', flexDirection: 'column', gap: 16 }} className="hover-card">
+                  <div>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>{job.title}</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-2)', fontSize: 13 }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Building2 size={14}/> {job.company_name}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={14}/> {job.location || 'Remote'}</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {(job.tags || []).slice(0, 3).map((tag: string) => (
+                      <span key={tag} style={{ padding: '4px 10px', background: 'var(--bg-btn)', borderRadius: 6, fontSize: 11, fontWeight: 600, color: 'var(--text-3)' }}>{tag}</span>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid var(--border-2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 600, color: '#10b981', fontSize: 14 }}>{job.salary_range || 'Competitive'}</span>
+                    <span style={{ color: 'var(--text-3)', fontSize: 13, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>Apply <ArrowRight size={14}/></span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {job.tags.map(tag => (
-                    <span key={tag} style={{ padding: '4px 10px', background: 'var(--bg-btn)', borderRadius: 6, fontSize: 11, fontWeight: 600, color: 'var(--text-3)' }}>{tag}</span>
-                  ))}
+              ))
+            ) : (
+              [
+                { title: 'Senior Frontend Engineer', company_name: 'Loading...', location: 'Remote', salary_range: '...', tags: ['React', 'Next.js'] },
+                { title: 'Machine Learning Architect', company_name: 'Loading...', location: 'Remote', salary_range: '...', tags: ['Python', 'LLMs'] },
+                { title: 'Director of Outbound Sales', company_name: 'Loading...', location: 'Remote', salary_range: '...', tags: ['B2B', 'Salesforce'] }
+              ].map((job, i) => (
+                <div key={i} style={{ padding: 24, background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 16, opacity: 0.6 }}>
+                  <div>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>{job.title}</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-2)', fontSize: 13 }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Building2 size={14}/> {job.company_name}</span>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid var(--border-2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 600, color: '#10b981', fontSize: 14 }}>{job.salary}</span>
-                  <span style={{ color: 'var(--text-3)', fontSize: 13, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>Apply <ArrowRight size={14}/></span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>
