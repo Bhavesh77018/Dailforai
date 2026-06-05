@@ -231,10 +231,10 @@ export default function JobBoard({ user, onLoginClick, initialSearch = '' }: Pro
 
       {/* Body */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 clamp(16px,3vw,32px) clamp(16px,3vw,32px)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 20, height: '100%' }}>
+        <div className="job-board-container">
 
           {/* Job List */}
-          <div style={{ flex: selectedJob ? '0 0 min(400px,50%)' : 1, display: 'flex', flexDirection: 'column', gap: 12, overflowY: selectedJob ? 'auto' : 'visible' }}>
+          <div className={`job-list-pane ${selectedJob ? 'has-selection' : ''}`}>
             {loading ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 80, flexDirection: 'column', gap: 16 }}>
                 <div className="typing-dots"><div className="typing-dot"/><div className="typing-dot"/><div className="typing-dot"/></div>
@@ -320,7 +320,7 @@ export default function JobBoard({ user, onLoginClick, initialSearch = '' }: Pro
 
           {/* Job Detail Panel */}
           {selectedJob && (
-            <div style={{ flex: 1, minWidth: 0, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, display: 'flex', flexDirection: 'column', overflow: 'hidden', maxHeight: '80vh', position: 'sticky', top: 0 }}>
+            <div className="job-detail-pane">
               {/* Panel Header */}
               <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexShrink: 0 }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -440,6 +440,54 @@ export default function JobBoard({ user, onLoginClick, initialSearch = '' }: Pro
           )}
         </div>
       </div>
+      <style>{`
+        .job-board-container {
+          max-width: 1100px;
+          margin: 0 auto;
+          display: flex;
+          gap: 20px;
+          height: 100%;
+        }
+        .job-list-pane {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          flex: 1;
+        }
+        .job-list-pane.has-selection {
+          flex: 0 0 min(400px, 50%);
+          overflow-y: auto;
+        }
+        .job-detail-pane {
+          flex: 1;
+          min-width: 0;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          max-height: 80vh;
+          position: sticky;
+          top: 0;
+        }
+
+        @media (max-width: 768px) {
+          .job-board-container {
+            flex-direction: column;
+            height: auto;
+          }
+          .job-list-pane.has-selection {
+            flex: none;
+            width: 100%;
+            overflow-y: visible;
+          }
+          .job-detail-pane {
+            max-height: none;
+            position: static;
+          }
+        }
+      `}</style>
     </div>
   );
 }
