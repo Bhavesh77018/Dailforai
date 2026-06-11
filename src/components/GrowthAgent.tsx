@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import {
   TrendingUp, Building2, Target, Users, Mail, Search, AlertTriangle,
   CheckCircle2, ArrowRight, Zap, BarChart3, Lightbulb, ShieldCheck,
@@ -45,11 +46,12 @@ const scoreGradient = (s: number) => s >= 90 ? 'rgba(16,185,129,0.08)' : s >= 75
 const urgencyColor = (u?: string) => u === 'High' ? '#ef4444' : u === 'Medium' ? '#f59e0b' : '#6b7280';
 
 const TABS = [
-  { id: 'leads',      label: 'Lead Discovery',  icon: <Target size={14}/> },
+  { id: 'dashboard',  label: 'CEO Dashboard',    icon: <BarChart3 size={14}/> },
+  { id: 'leads',      label: 'Lead Discovery',   icon: <Target size={14}/> },
   { id: 'icp',        label: 'ICP & Personas',   icon: <Users size={14}/> },
   { id: 'competitors',label: 'Competitors',       icon: <TrendingDown size={14}/> },
-  { id: 'outreach',   label: 'Outreach Intel',    icon: <Mail size={14}/> },
-  { id: 'strategy',   label: 'Growth Strategy',   icon: <Rocket size={14}/> },
+  { id: 'outreach',   label: 'Outreach Intel',   icon: <Mail size={14}/> },
+  { id: 'strategy',   label: 'Growth Strategy',  icon: <Rocket size={14}/> },
 ];
 
 const INDUSTRY_OPTIONS = [
@@ -116,9 +118,44 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
   const [step, setStep] = useState<'landing' | 'input' | 'loading' | 'results'>('landing');
   const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('leads');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [expandedLead, setExpandedLead] = useState<number | null>(null);
   const [result, setResult] = useState<AnalysisData | null>(null);
+  const [hasSavedProfile, setHasSavedProfile] = useState(false);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [savedLeadCount, setSavedLeadCount] = useState<number>(0);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      if (!user?.id) return;
+      const { data, error } = await supabase
+        .from('company_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (data) {
+        setForm(f => ({
+          ...f,
+          companyName: data.company_name || f.companyName,
+          website: data.website || f.website,
+          linkedin: data.linkedin || f.linkedin,
+          industry: data.industry || f.industry,
+          location: data.location || f.location,
+          size: data.size || f.size,
+          services: data.services || f.services,
+          businessNeeds: data.business_needs || f.businessNeeds,
+        }));
+        setHasSavedProfile(true);
+        setSavedAt(data.updated_at || data.created_at || null);
+        if (data.latest_analysis) {
+          setResult(data.latest_analysis);
+          setSavedLeadCount(data.latest_analysis?.leads?.length || 0);
+        }
+      }
+    }
+    fetchProfile();
+  }, [user?.id]);
 
   const defaultEmail = user?.email || '';
   const emailDomain = defaultEmail.split('@')[1]?.split('.')[0] || '';
@@ -141,78 +178,6 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
      LANDING STEP
      ══════════════════════════════════════════════════════════════ */
   if (step === 'landing') {
-    const isCompanyUser = user?.user_metadata?.account_type === 'company';
-    const isLoggedIn = !!user;
-
-    if (!isLoggedIn || !isCompanyUser) {
-      return (
-        <div className="fade-in" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', overflowY: 'auto' }}>
-          
-          <div style={{ maxWidth: 1000, margin: '0 auto', width: '100%' }}>
-            
-            {/* Hero / Header Section */}
-            <div style={{ textAlign: 'center', marginBottom: 60, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 72, height: 72, borderRadius: 20, background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(59,130,246,0.1))', border: '1px solid rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, boxShadow: '0 8px 30px rgba(16,185,129,0.15)' }}>
-                <TrendingUp size={36} style={{ color: '#10b981' }} />
-              </div>
-              
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', borderRadius: 999, fontSize: 12, fontWeight: 700, marginBottom: 16 }}>
-                <Lock size={14} /> Enterprise Feature
-              </div>
-
-              <h2 style={{ fontSize: 'clamp(32px,5vw,56px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 20, color: 'var(--text-1)', lineHeight: 1.1 }}>
-                Unlock your business potential with <br/>
-                <span style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Growth Intelligence</span>
-              </h2>
-              
-              <p style={{ fontSize: 'clamp(15px,2vw,18px)', color: 'var(--text-2)', lineHeight: 1.6, maxWidth: 640, margin: '0 auto 32px' }}>
-                Growth Intelligence is your autonomous Business Development Manager. Exclusively available to verified company accounts, it analyzes market gaps, builds highly-targeted Ideal Customer Profiles (ICPs), and generates outbound strategies on autopilot.
-              </p>
-
-              {!isLoggedIn ? (
-                <button className="btn btn-primary" onClick={() => {}} style={{ padding: '16px 40px', fontSize: 16, borderRadius: 14, display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 10px 30px rgba(16,185,129,0.3)', fontWeight: 700 }}>
-                  Create Company Account <ArrowRight size={18} />
-                </button>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                  <div style={{ padding: '12px 24px', background: 'rgba(239,68,68,0.1)', color: '#ef4444', borderRadius: 12, border: '1px solid rgba(239,68,68,0.2)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <AlertTriangle size={18} /> You are logged in as an Individual. Company upgrade required.
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Feature Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 80 }}>
-              {[
-                { icon: <Target size={24}/>, title: 'ICP & Persona Mapping', desc: 'Stop guessing who your buyers are. The Growth Agent analyzes millions of data points to pinpoint exactly which industries and titles are ready to buy your services.', color: '#8b5cf6' },
-                { icon: <Building2 size={24}/>, title: 'Competitor Intel', desc: 'Instantly generate detailed competitor battlecards. Understand their pricing, product weaknesses, and exactly how your sales team should position against them.', color: '#3b82f6' },
-                { icon: <Users size={24}/>, title: 'Automated Lead Discovery', desc: 'Once your ICP is defined, the agent autonomously scours LinkedIn, Crunchbase, and job boards to build a live list of high-intent leads.', color: '#10b981' },
-                { icon: <Mail size={24}/>, title: 'Outreach Playbooks', desc: 'Generates hyper-personalized cold email templates, LinkedIn connection sequences, and objection-handling scripts tailored to your new leads.', color: '#ec4899' },
-              ].map((card, i) => (
-                <div key={i} style={{ padding: 32, borderRadius: 24, background: 'var(--bg-card)', border: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', top: 0, right: 0, width: 120, height: 120, background: `radial-gradient(circle at top right, ${card.color}20, transparent 70%)`, pointerEvents: 'none' }} />
-                  <div style={{ width: 48, height: 48, borderRadius: 14, background: `${card.color}15`, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>{card.icon}</div>
-                  <h3 style={{ fontWeight: 800, fontSize: 18, color: 'var(--text-1)', marginBottom: 12 }}>{card.title}</h3>
-                  <p style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.6 }}>{card.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Preview Banner */}
-            <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: 24, padding: '40px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -100, left: '50%', transform: 'translateX(-50%)', width: 400, height: 400, background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0 }} />
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <ShieldCheck size={40} style={{ color: 'var(--text-3)', margin: '0 auto 20px' }} />
-                <h3 style={{ fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Ready to dominate your market?</h3>
-                <p style={{ color: 'var(--text-2)', marginBottom: 24, maxWidth: 500, margin: '0 auto' }}>Companies using DialforAI's Growth Intelligence see a 40% reduction in lead acquisition costs within the first quarter.</p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      );
-    }
 
     return (
     <div className="fade-in" style={{ padding: 'clamp(32px, 6vw, 80px) clamp(16px, 4vw, 40px)', maxWidth: 1100, margin: '0 auto', width: '100%', height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
@@ -240,24 +205,65 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
             className="btn btn-primary"
-            onClick={onLaunch}
+            onClick={() => setStep('input')}
             style={{ padding: '14px 32px', fontSize: 15, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 8px 30px rgba(16,185,129,0.3)', transition: 'all 0.3s' }}
             onMouseOver={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
             onMouseOut={e => (e.currentTarget.style.transform = 'translateY(0)')}
           >
-            Launch BDM Chat Agent <ArrowRight size={18} />
+            Launch Growth Intelligence <ArrowRight size={18} />
           </button>
-          <button
-            className="btn btn-outline"
-            onClick={() => setStep('input')}
-            style={{ padding: '14px 32px', fontSize: 15, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 10, transition: 'all 0.3s' }}
-            onMouseOver={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
-            onMouseOut={e => (e.currentTarget.style.transform = 'translateY(0)')}
-          >
-            Generate Full Report <Zap size={18} />
-          </button>
+          {hasSavedProfile && result ? (
+            <button
+              className="btn btn-outline"
+              onClick={() => setStep('results')}
+              style={{ padding: '14px 32px', fontSize: 15, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 10, transition: 'all 0.3s' }}
+              onMouseOver={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
+              onMouseOut={e => (e.currentTarget.style.transform = 'translateY(0)')}
+            >
+              View Latest Insights <Eye size={18} />
+            </button>
+          ) : (
+            <button
+              className="btn btn-outline"
+              onClick={() => setStep('input')}
+              style={{ padding: '14px 32px', fontSize: 15, borderRadius: 12, display: 'inline-flex', alignItems: 'center', gap: 10, transition: 'all 0.3s' }}
+              onMouseOver={e => (e.currentTarget.style.transform = 'translateY(-2px)')}
+              onMouseOut={e => (e.currentTarget.style.transform = 'translateY(0)')}
+            >
+              Generate Full Report <Zap size={18} />
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Welcome Back Banner */}
+      {hasSavedProfile && result && (
+        <div style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.08))', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 20, padding: '24px 28px', marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Building2 size={22} color="#10b981" />
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-1)', marginBottom: 4 }}>
+                👋 Welcome back, {form.companyName || 'your company'}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                {savedAt && <span>Last analysis: {new Date(savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>}
+                {savedLeadCount > 0 && <span style={{ color: '#10b981', fontWeight: 600 }}>• {savedLeadCount} leads found</span>}
+                {form.industry && <span>• {form.industry}</span>}
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <button onClick={() => { setActiveTab('dashboard'); setStep('results'); }} style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #10b981, #059669)', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>
+              <Eye size={14} /> View Latest Insights
+            </button>
+            <button onClick={() => setStep('input')} style={{ padding: '10px 20px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-btn)', color: 'var(--text-2)', fontWeight: 600, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>
+              <RefreshCw size={14} /> Run Fresh Analysis
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 8-Card AI Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 60 }}>
@@ -273,7 +279,7 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
         ].map((card, i) => (
           <button
             key={i}
-            onClick={onLaunch}
+            onClick={() => setStep('input')}
             style={{ textAlign: 'left', padding: 22, borderRadius: 16, border: `1px solid ${card.color}20`, background: card.bg, cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit' }}
             onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 8px 24px ${card.color}15`; }}
             onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none'; }}
@@ -333,8 +339,30 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
 
       if (!res.ok || !json.success) throw new Error(json.error || 'Analysis failed');
       setResult(json.data);
+      
+      // Save to database
+      if (user?.id) {
+        await supabase.from('company_profiles').upsert({
+          user_id: user.id,
+          company_name: form.companyName,
+          website: form.website,
+          linkedin: form.linkedin,
+          industry: form.industry,
+          location: form.location,
+          size: form.size,
+          services: form.services,
+          business_needs: form.businessNeeds,
+          latest_analysis: json.data,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+        setHasSavedProfile(true);
+        setSavedLeadCount(json.data?.leads?.length || 0);
+        setSavedAt(new Date().toISOString());
+      }
+
       setStep('results');
-      setActiveTab('leads');
+      setActiveTab('dashboard');
+
     } catch (e: any) {
       clearInterval(interval);
       setError(e.message || 'Something went wrong. Please try again.');
@@ -504,8 +532,8 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-3)' }}>{form.companyName || 'Your Company'} · {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
           </div>
-          <button onClick={() => { setStep('input'); setResult(null); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-btn)', color: 'var(--text-2)', cursor: 'pointer', fontSize: 13, fontWeight: 500, fontFamily: 'inherit' }}>
-            <RefreshCw size={13}/> New Analysis
+          <button onClick={() => { setStep('input'); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-btn)', color: 'var(--text-2)', cursor: 'pointer', fontSize: 13, fontWeight: 500, fontFamily: 'inherit' }}>
+            <RefreshCw size={13}/> Change Details & Rerun
           </button>
         </div>
 
@@ -567,6 +595,91 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
           ))}
         </div>
 
+        {/* ══ TAB: CEO DASHBOARD ═══════════════════════════════ */}
+        {activeTab === 'dashboard' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+            {/* North Star + Competitive Advantage */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+              {insights?.northStar && (
+                <div style={{ background: 'linear-gradient(135deg, rgba(79,70,229,0.1), rgba(16,185,129,0.08))', border: '1px solid rgba(79,70,229,0.3)', borderRadius: 16, padding: 24 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#4f46e5', marginBottom: 10, letterSpacing: '0.06em' }}>🧭 NORTH STAR METRIC</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-1)', lineHeight: 1.4 }}>{insights.northStar}</div>
+                </div>
+              )}
+              {insights?.competitiveAdvantage && (
+                <div style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.08))', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 16, padding: 24 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#10b981', marginBottom: 10, letterSpacing: '0.06em' }}>🏆 COMPETITIVE ADVANTAGE</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-1)', lineHeight: 1.5 }}>{insights.competitiveAdvantage}</div>
+                </div>
+              )}
+            </div>
+
+            {/* KPI tiles */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
+              {[
+                { label: 'Growth Stage', value: companyProfile?.currentGrowthStage, color: '#8b5cf6' },
+                { label: 'Revenue Model', value: companyProfile?.revenueModel, color: '#3b82f6' },
+                { label: 'Addressable Market', value: marketOpportunity?.addressableSegment, color: '#10b981' },
+                { label: 'Ideal Deal Size', value: icp?.idealDealSize, color: '#f59e0b' },
+                { label: 'Sales Cycle', value: icp?.salesCycleLength, color: '#ec4899' },
+              ].filter(k => k.value).map((kpi, i) => (
+                <div key={i} style={{ background: 'var(--bg-card)', border: `1px solid ${kpi.color}20`, borderRadius: 12, padding: '14px 16px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: kpi.color, marginBottom: 6, letterSpacing: '0.05em' }}>{kpi.label.toUpperCase()}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', lineHeight: 1.4 }}>{kpi.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Market Trends */}
+            {(marketOpportunity?.keyTrend1 || marketOpportunity?.keyTrend2 || marketOpportunity?.keyTrend3) && (
+              <SectionCard title="Key Market Trends" icon={<TrendingUp size={15}/>} accent="#06b6d4">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {[marketOpportunity?.keyTrend1, marketOpportunity?.keyTrend2, marketOpportunity?.keyTrend3].filter(Boolean).map((trend, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                      <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(6,182,212,0.12)', border: '1px solid rgba(6,182,212,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#06b6d4', flexShrink: 0 }}>T{i + 1}</div>
+                      <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, paddingTop: 4 }}>{trend}</div>
+                    </div>
+                  ))}
+                </div>
+              </SectionCard>
+            )}
+
+            {/* Quick Wins */}
+            {growthStrategy?.quickWins && growthStrategy.quickWins.length > 0 && (
+              <SectionCard title="Quick Wins — Do This Week" icon={<Zap size={15}/>} accent="#10b981">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
+                  {growthStrategy.quickWins.map((win: string, i: number) => (
+                    <div key={i} style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 12, padding: '16px 18px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                      <CheckCircle2 size={18} color="#10b981" style={{ flexShrink: 0, marginTop: 2 }}/>
+                      <span style={{ fontSize: 13, color: 'var(--text-1)', lineHeight: 1.6, fontWeight: 600 }}>{win}</span>
+                    </div>
+                  ))}
+                </div>
+              </SectionCard>
+            )}
+
+            {/* Channel Strategy */}
+            {growthStrategy?.channelStrategy && (
+              <SectionCard title="Channel Strategy" icon={<Globe size={15}/>} accent="#8b5cf6">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, marginBottom: 16 }}>
+                  <div style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: 10, padding: '14px 16px' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#8b5cf6', marginBottom: 6 }}>PRIMARY CHANNEL</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)' }}>{growthStrategy.channelStrategy.primaryChannel}</div>
+                  </div>
+                  <div style={{ background: 'rgba(139,92,246,0.04)', border: '1px solid rgba(139,92,246,0.15)', borderRadius: 10, padding: '14px 16px' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#8b5cf6', marginBottom: 6 }}>SECONDARY CHANNEL</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)' }}>{growthStrategy.channelStrategy.secondaryChannel}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, background: 'var(--bg-btn)', padding: '12px 14px', borderRadius: 8 }}>
+                  💡 {growthStrategy.channelStrategy.reasoning}
+                </div>
+              </SectionCard>
+            )}
+          </div>
+        )}
+
         {/* ══ TAB: LEAD DISCOVERY ══════════════════════════════ */}
         {activeTab === 'leads' && (
           <div>
@@ -608,6 +721,8 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
                     {/* Contact badge */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
                       <span style={{ fontSize: 11, color: '#4f46e5', fontWeight: 600, background: 'rgba(79,70,229,0.1)', padding: '3px 8px', borderRadius: 6 }}>{lead.contactType}</span>
+                      {lead.contactDepartment && <span style={{ fontSize: 10, color: 'var(--text-3)' }}>{lead.contactDepartment}</span>}
+                      {lead.urgencyLevel && <span style={{ fontSize: 10, fontWeight: 700, color: urgencyColor(lead.urgencyLevel) }}>{lead.urgencyLevel} Urgency</span>}
                       {expandedLead === i ? <ChevronUp size={14} color="var(--text-3)"/> : <ChevronDown size={14} color="var(--text-3)"/>}
                     </div>
                   </div>
@@ -615,7 +730,13 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
                   {/* Expanded detail */}
                   {expandedLead === i && (
                     <div style={{ borderTop: '1px solid var(--border)', padding: '14px 16px', background: 'var(--bg-main)' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 12 }}>
+                      {lead.scoreReason && (
+                        <div style={{ marginBottom: 12, padding: '10px 14px', background: 'rgba(16,185,129,0.08)', borderRadius: 8, border: '1px solid rgba(16,185,129,0.2)' }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981' }}>SCORE REASON: </span>
+                          <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{lead.scoreReason}</span>
+                        </div>
+                      )}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 12, marginBottom: 12 }}>
                         <div>
                           <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', marginBottom: 6 }}>WHY THIS IS A MATCH</div>
                           <p style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6 }}>{lead.whyMatch}</p>
@@ -625,7 +746,12 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
                           <p style={{ fontSize: 13, color: 'var(--text-1)', lineHeight: 1.6, fontStyle: 'italic' }}>"{lead.outreachAngle}"</p>
                         </div>
                       </div>
-                      <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 12 }}>
+                        {lead.estimatedRevenue && <div style={{ fontSize: 12, color: 'var(--text-2)' }}>💰 Revenue: <strong style={{ color: 'var(--text-1)' }}>{lead.estimatedRevenue}</strong></div>}
+                        {lead.estimatedDealValue && <div style={{ fontSize: 12, color: 'var(--text-2)' }}>🤝 Deal Value: <strong style={{ color: '#10b981' }}>{lead.estimatedDealValue}</strong></div>}
+                        {lead.subIndustry && <Pill text={lead.subIndustry} color="#06b6d4"/>}
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                         {lead.linkedinSearch && (
                           <a href={`https://www.google.com/search?q=${encodeURIComponent(lead.linkedinSearch)}`} target="_blank" rel="noopener noreferrer"
                             style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 7, background: 'rgba(79,70,229,0.1)', color: '#4f46e5', fontSize: 12, fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(79,70,229,0.2)' }}>
@@ -648,33 +774,67 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
         {/* ══ TAB: ICP & PERSONAS ══════════════════════════════ */}
         {activeTab === 'icp' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+            {/* Deal size + Sales cycle KPIs */}
+            {(icp?.idealDealSize || icp?.salesCycleLength) && (
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                {icp?.idealDealSize && <div style={{ flex: 1, minWidth: 180, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 12, padding: '14px 18px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: '#10b981', marginBottom: 4 }}>IDEAL DEAL SIZE</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-1)' }}>{icp.idealDealSize}</div>
+                </div>}
+                {icp?.salesCycleLength && <div style={{ flex: 1, minWidth: 180, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 12, padding: '14px 18px' }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: '#f59e0b', marginBottom: 4 }}>TYPICAL SALES CYCLE</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-1)' }}>{icp.salesCycleLength}</div>
+                </div>}
+              </div>
+            )}
+
             <SectionCard title="Ideal Customer Profile (ICP)" icon={<Target size={15}/>} accent="#4f46e5">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 12 }}>
                 {icp?.idealClients?.map((c: any, i: number) => (
                   <div key={i} style={{ background: 'var(--bg-btn)', borderRadius: 10, padding: 14 }}>
                     <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-1)', marginBottom: 4 }}>{c.type}</div>
-                    {c.size && <div style={{ fontSize: 11, color: '#4f46e5', fontWeight: 600, marginBottom: 6 }}>{c.size} employees</div>}
-                    <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5 }}>{c.reason}</div>
+                    {c.size && <div style={{ fontSize: 11, color: '#4f46e5', fontWeight: 600, marginBottom: 4 }}>{c.size} employees {c.annualRevenue ? `· ${c.annualRevenue}` : ''}</div>}
+                    {c.location && <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 6 }}>📍 {c.location}</div>}
+                    <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5, marginBottom: c.buyingTrigger ? 8 : 0 }}>{c.reason}</div>
+                    {c.buyingTrigger && <div style={{ fontSize: 11, color: '#10b981', fontWeight: 600, background: 'rgba(16,185,129,0.08)', padding: '6px 8px', borderRadius: 6 }}>⚡ Trigger: {c.buyingTrigger}</div>}
                   </div>
                 ))}
               </div>
             </SectionCard>
 
             <SectionCard title="Buyer Personas" icon={<Users size={15}/>} accent="#f59e0b">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {icp?.buyerPersonas?.map((p: any, i: number) => (
-                  <div key={i} style={{ display: 'flex', gap: 14, padding: '12px 14px', background: 'var(--bg-btn)', borderRadius: 10, alignItems: 'flex-start' }}>
-                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(245,158,11,0.15)', border: '2px solid rgba(245,158,11,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}>
-                      {['👤', '💼', '🎯', '🏢', '⚡'][i % 5]}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-                        <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-1)' }}>{p.title}</span>
-                        {p.department && <Pill text={p.department}/>}
+                  <div key={i} style={{ padding: '16px', background: 'var(--bg-btn)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 12 }}>
+                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'rgba(245,158,11,0.15)', border: '2px solid rgba(245,158,11,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}>
+                        {['👤', '💼', '🎯', '🏢', '⚡'][i % 5]}
                       </div>
-                      <div style={{ fontSize: 12, color: '#ef4444', marginBottom: 4 }}>Pain: {p.painPoint}</div>
-                      {p.trigger && <div style={{ fontSize: 12, color: '#10b981' }}>Trigger: {p.trigger}</div>}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-1)' }}>{p.title}</span>
+                          {p.department && <Pill text={p.department}/>}
+                        </div>
+                        {p.linkedinTitle && (
+                          <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(p.linkedinTitle)}`} target="_blank" rel="noopener noreferrer"
+                            style={{ fontSize: 11, color: '#0077b5', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+                            <Search size={10}/> Find on LinkedIn: {p.linkedinTitle}
+                          </a>
+                        )}
+                      </div>
                     </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 8, marginBottom: p.messagingHook ? 12 : 0 }}>
+                      <div style={{ fontSize: 12, color: '#ef4444', lineHeight: 1.5 }}><strong>Pain:</strong> {p.painPoint}</div>
+                      {p.trigger && <div style={{ fontSize: 12, color: '#10b981', lineHeight: 1.5 }}><strong>Trigger:</strong> {p.trigger}</div>}
+                      {p.objection && <div style={{ fontSize: 12, color: '#f59e0b', lineHeight: 1.5 }}><strong>Objection & Handle:</strong> {p.objection}</div>}
+                    </div>
+                    {p.messagingHook && (
+                      <div style={{ background: 'rgba(79,70,229,0.08)', border: '1px solid rgba(79,70,229,0.2)', borderRadius: 8, padding: '10px 14px' }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: '#4f46e5', marginBottom: 4 }}>💬 MESSAGING HOOK</div>
+                        <div style={{ fontSize: 13, color: 'var(--text-1)', fontStyle: 'italic', fontWeight: 600 }}>"{p.messagingHook}"</div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -699,16 +859,27 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
             {competitors?.map((c: any, i: number) => (
               <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 8 }}>
-                  <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-1)' }}>{c.name}</div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-1)', marginBottom: 2 }}>{c.name}</div>
+                    {c.size && <div style={{ fontSize: 12, color: 'var(--text-3)' }}>{c.size}</div>}
+                  </div>
                   <Pill text="Competitor" color="#ef4444"/>
                 </div>
+                {(c.battleCard || c.differentiationStrategy) && (
+                  <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 10, padding: '12px 16px', marginBottom: 14 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#10b981', marginBottom: 6, letterSpacing: '0.05em' }}>⚔️ BATTLE CARD — What to say in a sales call</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', fontStyle: 'italic' }}>"{c.battleCard || c.differentiationStrategy}"</div>
+                  </div>
+                )}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
                   {[
                     { label: 'POSITIONING', value: c.positioning, color: 'var(--text-2)' },
+                    { label: 'CLIENTS THEY WIN', value: c.clientsTheyWin, color: '#3b82f6' },
                     { label: 'THEIR STRENGTHS', value: c.strengths, color: '#f59e0b' },
-                    { label: 'THEIR WEAKNESS', value: c.weakness, color: '#10b981' },
-                    { label: 'HOW YOU WIN', value: c.differentiation, color: '#4f46e5' },
-                  ].map((d, j) => (
+                    { label: 'THEIR WEAKNESSES', value: c.weaknesses || c.weakness, color: '#10b981' },
+                    { label: 'PRICING SIGNAL', value: c.pricingSignal, color: '#8b5cf6' },
+                    { label: 'HOW YOU WIN', value: c.differentiationStrategy || c.differentiation, color: '#4f46e5' },
+                  ].filter(d => d.value).map((d, j) => (
                     <div key={j} style={{ background: 'var(--bg-btn)', borderRadius: 8, padding: '10px 12px' }}>
                       <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-3)', marginBottom: 6 }}>{d.label}</div>
                       <div style={{ fontSize: 12, color: d.color, lineHeight: 1.5 }}>{d.value}</div>
@@ -726,19 +897,39 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
             <SectionCard title="Best People to Contact" icon={<Users size={15}/>} accent="#4f46e5">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {outreachIntelligence?.bestContacts?.map((c: any, i: number) => (
-                  <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 14px', background: 'var(--bg-btn)', borderRadius: 10, alignItems: 'flex-start' }}>
-                    <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(79,70,229,0.15)', border: '1px solid rgba(79,70,229,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>
-                      {['🎯', '💼', '🏢', '⚡'][i % 4]}
+                  <div key={i} style={{ padding: '14px', background: 'var(--bg-btn)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: c.avoidMistake ? 10 : 0 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(79,70,229,0.15)', border: '1px solid rgba(79,70,229,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>
+                        {['🎯', '💼', '🏢', '⚡'][i % 4]}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: '#4f46e5', marginBottom: 4 }}>{c.title}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 4 }}>{c.why}</div>
+                        <div style={{ fontSize: 12, color: '#10b981', fontWeight: 600 }}>Approach: {c.approach}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#4f46e5', marginBottom: 4 }}>{c.title}</div>
-                      <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 4 }}>{c.why}</div>
-                      <div style={{ fontSize: 12, color: '#10b981', fontWeight: 600 }}>Approach: {c.approach}</div>
-                    </div>
+                    {c.avoidMistake && (
+                      <div style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 7, padding: '8px 12px', fontSize: 11, color: '#ef4444' }}>
+                        ⚠️ <strong>Avoid:</strong> {c.avoidMistake}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </SectionCard>
+
+            {outreachIntelligence?.subjectLineVariants && outreachIntelligence.subjectLineVariants.length > 0 && (
+              <SectionCard title="Subject Line Variants" icon={<Zap size={15}/>} accent="#f59e0b">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {outreachIntelligence.subjectLineVariants.map((s: string, i: number) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, background: 'var(--bg-btn)', borderRadius: 8, padding: '10px 14px' }}>
+                      <span style={{ fontSize: 13, color: 'var(--text-1)', fontWeight: 500 }}>{s}</span>
+                      <CopyBtn text={s}/>
+                    </div>
+                  ))}
+                </div>
+              </SectionCard>
+            )}
 
             {outreachIntelligence?.coldEmailTemplate && (
               <SectionCard title="Cold Email Template" icon={<Mail size={15}/>} accent="#f59e0b">
@@ -774,32 +965,83 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
                 </div>
               </SectionCard>
             )}
+
+            {outreachIntelligence?.doNotDo && outreachIntelligence.doNotDo.length > 0 && (
+              <SectionCard title="Common Outreach Mistakes to Avoid" icon={<AlertTriangle size={15}/>} accent="#ef4444">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {outreachIntelligence.doNotDo.map((m: string, i: number) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 12px', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 8 }}>
+                      <span style={{ fontSize: 14, flexShrink: 0 }}>❌</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5 }}>{m}</span>
+                    </div>
+                  ))}
+                </div>
+              </SectionCard>
+            )}
           </div>
         )}
 
         {/* ══ TAB: GROWTH STRATEGY ═════════════════════════════ */}
         {activeTab === 'strategy' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
-            {[
-              { label: '🚀 Immediate Actions', subtitle: '0–30 Days', items: growthStrategy?.immediate, color: '#ef4444' },
-              { label: '📈 Short Term', subtitle: '30–90 Days', items: growthStrategy?.shortTerm, color: '#f59e0b' },
-              { label: '🏆 Long Term', subtitle: '90+ Days', items: growthStrategy?.longTerm, color: '#10b981' },
-            ].map((phase, pi) => (
-              <div key={pi} style={{ background: 'var(--bg-card)', border: `1px solid ${phase.color}25`, borderRadius: 16, overflow: 'hidden' }}>
-                <div style={{ padding: '14px 18px', background: `${phase.color}10`, borderBottom: '1px solid var(--border)' }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-1)', marginBottom: 2 }}>{phase.label}</div>
-                  <div style={{ fontSize: 11, color: phase.color, fontWeight: 600 }}>{phase.subtitle}</div>
-                </div>
-                <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {phase.items?.map((item: string, i: number) => (
-                    <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                      <ArrowRight size={13} color={phase.color} style={{ flexShrink: 0, marginTop: 2 }}/>
-                      <span style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5 }}>{item}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+            {growthStrategy?.quickWins && growthStrategy.quickWins.length > 0 && (
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#10b981', marginBottom: 10 }}>⚡ QUICK WINS — Under 2 Weeks</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
+                  {growthStrategy.quickWins.map((win: string, i: number) => (
+                    <div key={i} style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 12, padding: '14px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                      <CheckCircle2 size={16} color="#10b981" style={{ flexShrink: 0, marginTop: 1 }}/>
+                      <span style={{ fontSize: 13, color: 'var(--text-1)', lineHeight: 1.5, fontWeight: 600 }}>{win}</span>
                     </div>
                   ))}
                 </div>
               </div>
-            ))}
+            )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+              {[
+                { label: '🚀 Immediate Actions', subtitle: '0–30 Days', items: growthStrategy?.immediate, color: '#ef4444' },
+                { label: '📈 Short Term', subtitle: '30–90 Days', items: growthStrategy?.shortTerm, color: '#f59e0b' },
+                { label: '🏆 Long Term', subtitle: '90+ Days', items: growthStrategy?.longTerm, color: '#10b981' },
+              ].map((phase, pi) => (
+                <div key={pi} style={{ background: 'var(--bg-card)', border: `1px solid ${phase.color}25`, borderRadius: 16, overflow: 'hidden' }}>
+                  <div style={{ padding: '14px 18px', background: `${phase.color}10`, borderBottom: '1px solid var(--border)' }}>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-1)', marginBottom: 2 }}>{phase.label}</div>
+                    <div style={{ fontSize: 11, color: phase.color, fontWeight: 600 }}>{phase.subtitle}</div>
+                  </div>
+                  <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {phase.items?.map((item: string, i: number) => (
+                      <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                        <ArrowRight size={13} color={phase.color} style={{ flexShrink: 0, marginTop: 2 }}/>
+                        <span style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5 }}>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {growthStrategy?.channelStrategy && (
+              <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: 16, padding: 20 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#8b5cf6', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Globe size={14}/> Channel Strategy
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 14 }}>
+                  <div style={{ background: 'rgba(139,92,246,0.08)', borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#8b5cf6', marginBottom: 4 }}>PRIMARY</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)' }}>{growthStrategy.channelStrategy.primaryChannel}</div>
+                  </div>
+                  <div style={{ background: 'rgba(139,92,246,0.04)', borderRadius: 10, padding: '12px 14px' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: '#8b5cf6', marginBottom: 4 }}>SECONDARY</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)' }}>{growthStrategy.channelStrategy.secondaryChannel}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, background: 'var(--bg-btn)', padding: '12px 14px', borderRadius: 8 }}>
+                  💡 {growthStrategy.channelStrategy.reasoning}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

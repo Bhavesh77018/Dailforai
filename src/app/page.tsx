@@ -109,7 +109,11 @@ export default function Home() {
 
   const launchAgent = (agent: 'recruitment' | 'sales' | 'prospect' | 'growth') => {
     setSelectedAgent(agent);
-    setView('chat');
+    if (agent === 'growth') {
+      setView('growth');
+    } else {
+      setView('chat');
+    }
     setSidebarOpen(false);
   };
 
