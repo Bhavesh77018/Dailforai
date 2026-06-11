@@ -99,3 +99,27 @@ CREATE INDEX IF NOT EXISTS idx_jobs_company ON jobs(company_domain);
 
 ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow all" ON jobs FOR ALL USING (true) WITH CHECK (true);
+
+-- ============================================================
+-- Company Profiles Table (saves company details and insights for Growth Agent)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS company_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID UNIQUE NOT NULL,
+  company_name TEXT,
+  website TEXT,
+  linkedin TEXT,
+  industry TEXT,
+  location TEXT,
+  size TEXT,
+  services TEXT,
+  business_needs TEXT,
+  latest_analysis JSONB,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_company_profiles_user ON company_profiles(user_id);
+
+ALTER TABLE company_profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all" ON company_profiles FOR ALL USING (true) WITH CHECK (true);

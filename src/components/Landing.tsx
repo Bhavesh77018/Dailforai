@@ -269,7 +269,7 @@ export default function Landing({ onLaunchChat, onSearchJobs }: LandingProps) {
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
                   </div>
                   <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div style={{ padding: 12, background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, color: 'var(--text-3)' }}>Company profile: Infinity STS</div>
+                    <div style={{ padding: 12, background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, color: 'var(--text-3)' }}>Company profile: Your Company</div>
                     <div style={{ padding: 12, background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderRadius: 8, fontSize: 13 }}>"BDM Growth Strategy: Target USA healthcare clinics with IT staffing. Competitor gap: custom EHR integrations."</div>
                   </div>
                 </div>

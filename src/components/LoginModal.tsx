@@ -184,7 +184,7 @@ export default function LoginModal({ onClose, onSuccess }: Props) {
         {mode === 'signup' && isCompany && (
           <div className="form-group">
             <label className="form-label">Company Name *</label>
-            <input className="form-input" placeholder="e.g. Infinity STS" value={companyName} onChange={e => setCompanyName(e.target.value)} />
+            <input className="form-input" placeholder="e.g. Your Company" value={companyName} onChange={e => setCompanyName(e.target.value)} />
           </div>
         )}
 

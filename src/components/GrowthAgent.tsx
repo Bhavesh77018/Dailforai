@@ -406,8 +406,8 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
             {[
-              { label: 'Company Name *', key: 'companyName', placeholder: 'e.g. Infinity STS', type: 'input' },
-              { label: 'Website', key: 'website', placeholder: 'e.g. www.infinitysts.com', type: 'input' },
+              { label: 'Company Name *', key: 'companyName', placeholder: 'e.g. Your Company', type: 'input' },
+              { label: 'Website', key: 'website', placeholder: 'e.g. www.yourcompany.com', type: 'input' },
               { label: 'LinkedIn Company URL', key: 'linkedin', placeholder: 'linkedin.com/company/yourcompany', type: 'input' },
               { label: 'Location', key: 'location', placeholder: 'e.g. India / USA / Remote', type: 'input' },
             ].map(f => (
