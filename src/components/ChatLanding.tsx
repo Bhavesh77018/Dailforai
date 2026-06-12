@@ -248,6 +248,10 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
                   className={`agent-pill ${selectedAgent === a.id ? `selected selected-${a.classSuffix}` : ''}`} 
                   onClick={() => {
                     if (a.id === selectedAgent) return;
+                    if (a.id === 'growth') {
+                      onNavigate('growth');
+                      return;
+                    }
                     if (messages.length > 0) {
                       setPendingAgent(a.id); // show confirmation modal
                     } else {
@@ -416,6 +420,10 @@ export default function ChatLanding({ onNavigate, onChatAction, user, selectedAg
                 }} 
                 onClick={() => {
                   if (a.id === selectedAgent) return;
+                  if (a.id === 'growth') {
+                    onNavigate('growth');
+                    return;
+                  }
                   if (messages.length > 0) {
                     setPendingAgent(a.id);
                   } else {
