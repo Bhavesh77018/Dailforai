@@ -200,21 +200,26 @@ INDUSTRY: ${industry || 'Not provided'}
 HEADQUARTERS: ${location || 'Not provided'}
 TEAM SIZE: ${size ? size + ' employees' : 'Not provided'}
 
-WHAT THE COMPANY DOES:
+WHAT THE COMPANY DOES (CORE KEYWORDS):
 ${services || 'Not provided — infer from company name/industry'}
 
-===== BUSINESS NEEDS & INTELLIGENCE REQUEST =====
+===== BUSINESS NEEDS, GOALS & TARGET KEYWORDS =====
 ${businessNeeds || 'General business growth, lead generation, and client acquisition'}
 
 ===== ANALYST INSTRUCTIONS =====
 Based on this company profile and their specific business needs above, generate a complete growth intelligence report.
 
+CRITICAL NEW INSTRUCTIONS FOR UNIQUENESS & KEYWORD ADHERENCE:
+- YOUR ENTIRE REPORT MUST BE DRIVEN BY THE SPECIFIC KEYWORDS PROVIDED ABOVE. Do not deviate into generic advice.
+- You MUST identify a UNIQUE angle or market positioning that is NOT available anywhere else. What makes this company fundamentally different and relevant based on their specific keywords? Highlight this in the insights and competitive advantage.
+- Do NOT provide generic platitudes. Every sentence must contain unique insight tailored strictly to their exact service niche and keywords.
+
 Key priorities:
-1. Leads must be EXACTLY matched to what they asked for — if they say "need healthcare clients in USA" every lead should be a US healthcare company
-2. The cold email template must be ready-to-send with specific hooks based on REAL signals for companies in their target market
-3. Competitors should be the ACTUAL companies they compete with, not generic ones
-4. The growth strategy must account for their current company size and market position
-5. All scores must reflect GENUINE match quality — do not give everyone 90+
+1. Leads must be EXACTLY matched to the keywords they asked for — if they say "need healthcare clients in USA" every lead should be a US healthcare company.
+2. The cold email template must be ready-to-send with specific hooks based on REAL signals for companies in their target market.
+3. Competitors should be the ACTUAL companies they compete with in their highly specific keyword niche, not generic massive corporations unless relevant.
+4. The growth strategy must account for their unique positioning and keyword relevance.
+5. All scores must reflect GENUINE match quality — do not give everyone 90+.
 
 Generate the analysis now. Return valid JSON only.`;
 

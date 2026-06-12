@@ -5,7 +5,7 @@ import {
   TrendingUp, Building2, Target, Users, Mail, Search, AlertTriangle,
   CheckCircle2, ArrowRight, Zap, BarChart3, Lightbulb, ShieldCheck,
   Clock, Star, MapPin, Globe, Briefcase, ChevronDown, ChevronUp,
-  RefreshCw, Copy, Check, Rocket, Eye, Award, TrendingDown, Lock
+  RefreshCw, Copy, Check, Rocket, Eye, Award, TrendingDown, Lock, Download
 } from 'lucide-react';
 
 /* ─── Types ───────────────────────────────────────────────────── */
@@ -314,6 +314,37 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
     );
   }
 
+  /* ── Download Report ──────────────────────────────────────── */
+  const downloadReport = () => {
+    if (!result) return;
+    const content = `# Growth Intelligence Report: ${form.companyName || 'Your Company'}\n\n` +
+      `Generated on: ${new Date().toLocaleDateString()}\n\n` +
+      `## 1. Top Insights\n` +
+      `- **Top Insight:** ${result.insights?.topInsight || 'N/A'}\n` +
+      `- **Urgent Action:** ${result.insights?.urgentAction || 'N/A'}\n` +
+      `- **Biggest Opportunity:** ${result.insights?.biggestOpportunity || 'N/A'}\n` +
+      `- **Watch Out For:** ${result.insights?.warningSign || 'N/A'}\n\n` +
+      `## 2. Company & Market\n` +
+      `**Overview:** ${result.companyProfile?.overview || 'N/A'}\n\n` +
+      `**Market Opportunity:** ${result.marketOpportunity?.summary || 'N/A'}\n\n` +
+      `**Estimated Market Size:** ${result.marketOpportunity?.estimatedMarketSize || 'N/A'}\n\n` +
+      `## 3. High-Value Leads\n\n` +
+      (result.leads || []).map((l: any, i: number) => `### ${i+1}. ${l.company} (Score: ${l.score})\n- **Industry:** ${l.industry}\n- **Why Match:** ${l.whyMatch}\n- **Hiring Signal:** ${l.hiringSignal}\n- **Angle:** ${l.outreachAngle}\n`).join('\n') +
+      `\n## 4. Outreach Strategy\n\n` +
+      `**Cold Email Template:**\n\n${result.outreachIntelligence?.coldEmailTemplate || 'N/A'}\n\n` +
+      `**LinkedIn Message:**\n\n${result.outreachIntelligence?.linkedinMessage || 'N/A'}\n\n`;
+
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Growth_Report_${form.companyName?.replace(/\s+/g, '_') || 'Company'}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   /* ── Run analysis ─────────────────────────────────────────── */
   const analyze = async () => {
     if (!form.companyName.trim() && !form.businessNeeds.trim()) {
@@ -327,6 +358,22 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
     const interval = setInterval(() => {
       setLoadingStep(s => (s + 1) % LOADING_STEPS.length);
     }, 1400);
+
+    // Eagerly save form details so they aren't lost if the request fails
+    if (user?.id) {
+      await supabase.from('company_profiles').upsert({
+        user_id: user.id,
+        company_name: form.companyName,
+        website: form.website,
+        linkedin: form.linkedin,
+        industry: form.industry,
+        location: form.location,
+        size: form.size,
+        services: form.services,
+        business_needs: form.businessNeeds,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+    }
 
     try {
       const res = await fetch('/api/ai-agents/growth/analyze', {
@@ -435,10 +482,16 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
           </div>
 
           <div className="form-group" style={{ marginBottom: 0, marginTop: 14 }}>
-            <label className="form-label">Services / What Your Company Does</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label className="form-label" style={{ marginBottom: 0 }}>Services / What Your Company Does</label>
+              <span style={{ fontSize: 11, color: form.services.length >= 1000 ? '#ef4444' : 'var(--text-3)', fontWeight: 500 }}>
+                {form.services.length} / 1000 max
+              </span>
+            </div>
             <textarea
               className="form-input"
               rows={3}
+              maxLength={1000}
               placeholder="e.g. We provide IT staffing, permanent recruitment, and contract workforce solutions for mid-large enterprises across the US and India."
               value={form.services}
               onChange={set('services')}
@@ -449,14 +502,20 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
 
         {/* Business Needs Section */}
         <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 16, padding: 'clamp(16px, 3vw, 28px)', marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid var(--border)', flexWrap: 'wrap' }}>
             <Target size={16} color="#10b981"/>
             <span style={{ fontWeight: 700, fontSize: 14 }}>Business Needs & Goals *</span>
-            <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--text-3)' }}>The more detail, the better leads you get</span>
+            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontSize: 11, color: 'var(--text-3)' }} className="hide-on-mobile">The more detail, the better leads you get</span>
+              <span style={{ fontSize: 11, color: form.businessNeeds.length >= 2000 ? '#ef4444' : 'var(--text-3)', fontWeight: 600, background: 'var(--bg-btn)', padding: '4px 8px', borderRadius: 6 }}>
+                {form.businessNeeds.length} / 2000 limit
+              </span>
+            </div>
           </div>
           <textarea
             className="form-input"
             rows={5}
+            maxLength={2000}
             placeholder={`Tell the agent exactly what you need. Examples:\n\n• We need recruitment clients in the pharma/healthcare space in USA\n• Looking for manufacturing companies hiring SAP consultants\n• Need IT staffing clients — companies hiring 50+ contractors\n• Want to find investors / VCs interested in HR-tech\n• Need software development clients in fintech sector`}
             value={form.businessNeeds}
             onChange={set('businessNeeds')}
@@ -532,9 +591,14 @@ export default function GrowthAgent({ user, onLaunch }: GrowthAgentProps) {
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-3)' }}>{form.companyName || 'Your Company'} · {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
           </div>
-          <button onClick={() => { setStep('input'); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-btn)', color: 'var(--text-2)', cursor: 'pointer', fontSize: 13, fontWeight: 500, fontFamily: 'inherit' }}>
-            <RefreshCw size={13}/> Change Details & Rerun
-          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={downloadReport} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-btn)', color: 'var(--text-1)', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'inherit' }}>
+              <Download size={13}/> Download Report
+            </button>
+            <button onClick={() => { setStep('input'); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-btn)', color: 'var(--text-2)', cursor: 'pointer', fontSize: 13, fontWeight: 500, fontFamily: 'inherit' }}>
+              <RefreshCw size={13}/> Change Details & Rerun
+            </button>
+          </div>
         </div>
 
         {/* ── Insight Cards ─────────────────────────────────────── */}
